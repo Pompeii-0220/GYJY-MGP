@@ -1,6 +1,6 @@
 import json
 import requests
-from datetime import datetime
+from datetime import datetime, timezone, timedelta
 
 # 1. 读取本地数据
 with open("data.json", "r", encoding="utf-8") as f:
@@ -11,13 +11,13 @@ recipes = data["recipes"]
 prod_speed = data["production_speed"]
 category = data["category"]
 
-# 2. 从 API 获取终端物品倍率（API 里的名称就是物品名，不再加“出售”前缀）
+# 2. 从 API 获取终端物品倍率
 url = "http://gyjy.xmonecode.com/api/public/retail-prices"
 resp = requests.get(url)
 resp.raise_for_status()
 retail_items = resp.json().get("rows", [])
 
-known_multipliers = {}  # 直接已知倍率的物品（来自API）
+known_multipliers = {}
 for item in retail_items:
     api_name = item.get("name", "")
     if api_name and api_name in guide_prices:
@@ -25,7 +25,7 @@ for item in retail_items:
 
 print(f"✅ 从API获取到 {len(known_multipliers)} 个终端物品倍率")
 
-# 3. 构建消耗关系（下游消耗了哪些上游原料）
+# 3. 构建消耗关系
 consumers = {}
 for product, ingredients in recipes.items():
     for ing, amount in ingredients:
@@ -33,40 +33,31 @@ for product, ingredients in recipes.items():
             consumers[ing] = []
         consumers[ing].append((product, amount))
 
-# 4. 计算每个物品的“有效物理需求速率”（终端销量向上游传导）
-#    先找出所有终端零售品（即 API 里有倍率的物品），它们在 prod_speed 中的速度就是终端销量
+# 4. 计算物理需求（终端销量向上游传导）
 terminal_speed = {}
 for name, mult in known_multipliers.items():
     if name in prod_speed:
         terminal_speed[name] = prod_speed[name]
-    else:
-        print(f"⚠️ 终端物品 {name} 缺少生产速度数据，跳过")
 
-#    虚拟需求：每个物品因为下游终端销量而产生的每小时需求量
 virtual_demand = {}
 for item in guide_prices:
     virtual_demand[item] = 0.0
 
-#    从终端开始，向上游累加需求
 for term_name, speed in terminal_speed.items():
     virtual_demand[term_name] = max(virtual_demand[term_name], speed)
 
-#    反复向上游传递，直到所有需求稳定
 changed = True
 while changed:
     changed = False
     for product, ingredients in recipes.items():
         if virtual_demand.get(product, 0) > 0:
-            # 把 product 的需求按配方分摊到它的原料上
             for ing, amount_per in ingredients:
-                # 原料 ing 因为 product 而产生的需求 = product 的需求 × 每产1个 product 消耗的 ing 数量
                 added_demand = virtual_demand[product] * amount_per
                 if added_demand > virtual_demand[ing]:
                     virtual_demand[ing] = added_demand
                     changed = True
 
-# 5. 用物理需求速率计算所有物品的加权倍率
-#    对于每个物品，倍率 = Σ (下游需求速率 × 下游倍率) / Σ (下游需求速率)
+# 5. 加权计算倍率
 multipliers = {}
 multipliers.update(known_multipliers)
 
@@ -94,14 +85,15 @@ while changed:
             multipliers[item] = round(weighted_mult / total_demand, 4)
             changed = True
 
-# 6. 计算最终价格
+# 6. 最终价格
 prices = {}
 for item, base_price in guide_prices.items():
     mult = multipliers.get(item, 1.0)
     prices[item] = round(base_price * mult, 2)
 
-# 7. 生成 HTML
-update_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+# 7. 生成 HTML（使用北京时间）
+beijing_tz = timezone(timedelta(hours=8))
+update_time = datetime.now(tz=beijing_tz).strftime("%Y-%m-%d %H:%M:%S")
 
 cat_order = [
     "电力与基础资源",
