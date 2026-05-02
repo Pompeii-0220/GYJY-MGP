@@ -10,26 +10,26 @@ recipes = data["recipes"]
 prod_speed = data["production_speed"]
 category = data["category"]
 
-# 2. 从 API 获取零售品倍率
+# 2. 从 API 获取终端物品倍率，并直接映射为物品本身的倍率
 url = "http://gyjy.xmonecode.com/api/public/retail-prices"
 resp = requests.get(url)
 resp.raise_for_status()
 retail_items = resp.json().get("rows", [])
 
-retail_multipliers = {}
+known_multipliers = {}  # 直接已知倍率的物品（来自API）
 for item in retail_items:
     api_name = item.get("name", "")
     if not api_name:
         continue
-    table_retail_name = "出售" + api_name
-    if table_retail_name in guide_prices:
-        retail_multipliers[table_retail_name] = item["multiplier"]
+    # API 返回的名称就是我们 data.json 中的物品名（如“牛奶”“苹果”等）
+    if api_name in guide_prices:
+        known_multipliers[api_name] = item["multiplier"]
     else:
-        print(f"⚠️ 表格中找不到零售品: {table_retail_name}")
+        print(f"⚠️ 表格中找不到物品: {api_name}")
 
-print(f"✅ 从API获取到 {len(retail_multipliers)} 个终端商品倍率")
+print(f"✅ 从API获取到 {len(known_multipliers)} 个终端物品倍率")
 
-# 3. 构建消耗关系（下游 -> 上游）
+# 3. 构建消耗关系（谁消耗了谁）
 consumers = {}
 for product, ingredients in recipes.items():
     for ing, amount in ingredients:
@@ -39,7 +39,7 @@ for product, ingredients in recipes.items():
 
 # 4. 迭代计算所有物品倍率
 multipliers = {}
-multipliers.update(retail_multipliers)
+multipliers.update(known_multipliers)  # 先填入已知的
 
 all_items = list(guide_prices.keys())
 changed = True
@@ -72,7 +72,7 @@ for item, base_price in guide_prices.items():
     mult = multipliers.get(item, 1.0)
     prices[item] = round(base_price * mult, 2)
 
-# 6. 生成 HTML（按产业分类，不再有独立的“零售品”板块）
+# 6. 生成 HTML
 cat_order = [
     "电力与基础资源",
     "农场产品",
@@ -128,7 +128,8 @@ for cat in cat_order:
     for item in items:
         price = prices.get(item, "?")
         mult = multipliers.get(item, 1.0)
-        mult_str = f' ×{mult:.2f}' if abs(mult - 1.0) > 0.001 else ""
+        # 倍率显示优化：只显示倍率>1.0001 的，使用中文括号避免误解
+        mult_str = f'（倍率 {mult:.2f}）' if abs(mult - 1.0) > 0.001 else ""
         html += f'<tr><td>{item}</td><td class="price">{price} 元{mult_str}</td></tr>'
     html += '</table></div>'
 
