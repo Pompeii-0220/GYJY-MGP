@@ -1,0 +1,30 @@
+name: Update guide prices
+
+on:
+  schedule:
+    - cron: '7 * * * *'   # 北京时间每个整点15分
+  workflow_dispatch:
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          persist-credentials: true
+      - uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+      - name: Install requests
+        run: pip install requests
+      - name: Run update script
+        run: python update.py
+      - name: Commit and push if changed
+        run: |
+          git config --global user.name 'github-actions'
+          git config --global user.email 'actions@github.com'
+          git add index.html
+          if ! git diff --cached --quiet; then
+            git commit -m "Update guide prices"
+            git push
+          fi
