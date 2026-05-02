@@ -14,9 +14,8 @@ category = data["category"]
 url = "http://gyjy.xmonecode.com/api/public/retail-prices"
 resp = requests.get(url)
 resp.raise_for_status()
-retail_items = resp.json().get("rows", [])  # ← 修复在这里
+retail_items = resp.json().get("rows", [])
 
-# 映射：API的 name -> 表格中的 “出售”+name
 retail_multipliers = {}
 for item in retail_items:
     api_name = item.get("name", "")
@@ -28,7 +27,7 @@ for item in retail_items:
     else:
         print(f"⚠️ 表格中找不到零售品: {table_retail_name}")
 
-print(f"✅ 从API获取到 {len(retail_multipliers)} 个零售品倍率")
+print(f"✅ 从API获取到 {len(retail_multipliers)} 个终端商品倍率")
 
 # 3. 构建消耗关系（下游 -> 上游）
 consumers = {}
@@ -73,15 +72,14 @@ for item, base_price in guide_prices.items():
     mult = multipliers.get(item, 1.0)
     prices[item] = round(base_price * mult, 2)
 
-# 6. 生成 HTML
+# 6. 生成 HTML（按产业分类，不再有独立的“零售品”板块）
 cat_order = [
     "电力与基础资源",
     "农场产品",
     "牧场产品",
     "加工中间品",
     "中央厨房产品",
-    "时装/工业产品",
-    "零售品"
+    "时装/工业产品"
 ]
 items_by_cat = {c: [] for c in cat_order}
 for item, cat in category.items():
