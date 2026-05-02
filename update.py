@@ -1,6 +1,5 @@
 import json
 import requests
-import os
 
 # 1. 读取本地数据
 with open("data.json", "r", encoding="utf-8") as f:
@@ -15,87 +14,66 @@ category = data["category"]
 url = "http://gyjy.xmonecode.com/api/public/retail-prices"
 resp = requests.get(url)
 resp.raise_for_status()
-retail_items = resp.json()
+retail_items = resp.json().get("rows", [])  # ← 修复在这里
 
-# 暂时用简单映射：API的 name 去掉可能存在的"出售"前缀后与表格零售品匹配
-# 但你的表格零售品就叫"出售牛奶"，API里是"牛奶"，所以映射关系：
-retail_multipliers = {}  # key = 表格中的零售品名称，value = multiplier
+# 映射：API的 name -> 表格中的 “出售”+name
+retail_multipliers = {}
 for item in retail_items:
-    api_name = item["name"]
-    # 直接映射：表格中零售品名称就是 "出售" + API名称
+    api_name = item.get("name", "")
+    if not api_name:
+        continue
     table_retail_name = "出售" + api_name
     if table_retail_name in guide_prices:
         retail_multipliers[table_retail_name] = item["multiplier"]
     else:
-        # 处理特殊情况：API有"咖啡粉" -> 表格"出售咖啡粉"，其实规则一样
-        # 如果上面的直接映射不成功，尝试下面的硬编码补充
-        pass
+        print(f"⚠️ 表格中找不到零售品: {table_retail_name}")
 
-# 手动补充几个API返回但可能名字不完全对应的（比如橙汁->出售橙汁，已经覆盖）
-# 如果还有漏掉的，可以在此添加
+print(f"✅ 从API获取到 {len(retail_multipliers)} 个零售品倍率")
 
-# 3. 构建消耗关系：谁消耗了谁（下游 -> 上游），用于从零售品向上游推算
-# 即：对于每一对 (产品X，原料Y)，X消耗Y，X是下游，Y是上游
-consumers = {}  # key = 原料Y，value = list of (下游X, 每产1个X消耗Y的数量)
+# 3. 构建消耗关系（下游 -> 上游）
+consumers = {}
 for product, ingredients in recipes.items():
     for ing, amount in ingredients:
         if ing not in consumers:
             consumers[ing] = []
         consumers[ing].append((product, amount))
 
-# 4. 计算所有物品的倍率（迭代从零售品开始，向上游传播）
-# 使用拓扑排序或迭代直到稳定
-multipliers = {}  # 所有物品的倍率
-# 初始已知：零售品倍率
+# 4. 迭代计算所有物品倍率
+multipliers = {}
 multipliers.update(retail_multipliers)
 
-# 需要计算倍率的物料集合（所有在guide_prices中出现且不是纯零售的）
 all_items = list(guide_prices.keys())
-# 有些物品可能既不是零售也不被任何消耗（比如基础资源电力、水、原油等），它们的倍率无法从下游推导
-# 我们将其倍率设为1.0（即不乘倍率）或你可以设定特殊规则
-# 但根据你的逻辑，它们应该由它们的下游（比如电力的下游是塑料、糖等）加权得到
-# 所以我们尝试迭代计算所有物品
-
-# 迭代直到稳定
 changed = True
 while changed:
     changed = False
     for item in all_items:
         if item in multipliers:
-            continue  # 已有倍率
+            continue
         if item not in consumers:
-            # 没有下游消耗它（比如基础资源如果没被任何配方消耗，则倍率设1）
-            # 但根据recipes，电力被水、种子、糖等多个消耗，所以不会进入这里
             multipliers[item] = 1.0
             changed = True
             continue
 
-        # 根据所有直接下游的倍率加权计算
         downstream = consumers[item]
         total_weight = 0.0
         weighted_mult = 0.0
         for down_prod, amount_per_prod in downstream:
-            # 该下游的生产速度（每小时产量）
             speed = prod_speed.get(down_prod, 0)
-            # 该下游消耗该原料的总速率 = 生产速度 * 每产1个消耗量
             consume_rate = speed * amount_per_prod
             if down_prod in multipliers:
                 weighted_mult += consume_rate * multipliers[down_prod]
                 total_weight += consume_rate
-            # 如果下游倍率还未知，则跳过本次计算（等待下一轮迭代）
         if total_weight > 0:
-            new_mult = weighted_mult / total_weight
-            multipliers[item] = round(new_mult, 4)
+            multipliers[item] = round(weighted_mult / total_weight, 4)
             changed = True
 
-# 5. 结合原始指导价计算新价格
+# 5. 计算最终价格
 prices = {}
 for item, base_price in guide_prices.items():
     mult = multipliers.get(item, 1.0)
     prices[item] = round(base_price * mult, 2)
 
 # 6. 生成 HTML
-# 按分类组织
 cat_order = [
     "电力与基础资源",
     "农场产品",
@@ -129,7 +107,6 @@ html = """
   th { background: #fafafa; font-weight: 600; color: #555; }
   .price { font-weight: 600; color: #e67e22; }
   .mult { color: #27ae60; font-size: 13px; margin-left: 6px; }
-  .mult::before { content: "×"; }
 </style>
 </head>
 <body>
@@ -138,23 +115,22 @@ html = """
   <div class="update-time">更新时间：<span id="update"></span></div>
 """
 
-# 插入更新时间脚本
 html += """
 <script>
   var now = new Date();
-  document.getElementById('update').innerText = now.toLocaleString('zh-CN');
+  document.getElementById('update').innerText = now.toLocaleString('zh-CN', {timeZone: 'Asia/Shanghai'});
 </script>
 """
 
 for cat in cat_order:
-    items = items_by_cat[cat]
+    items = items_by_cat.get(cat, [])
     if not items:
         continue
     html += f'<div class="category"><h2>{cat}</h2><table><tr><th>商品</th><th>指导价</th></tr>'
     for item in items:
-        price = prices.get(item, guide_prices.get(item, "?"))
+        price = prices.get(item, "?")
         mult = multipliers.get(item, 1.0)
-        mult_str = f'<span class="mult">{mult:.2f}</span>' if abs(mult - 1.0) > 0.001 else ""
+        mult_str = f' ×{mult:.2f}' if abs(mult - 1.0) > 0.001 else ""
         html += f'<tr><td>{item}</td><td class="price">{price} 元{mult_str}</td></tr>'
     html += '</table></div>'
 
@@ -167,4 +143,4 @@ html += """
 with open("index.html", "w", encoding="utf-8") as f:
     f.write(html)
 
-print("更新完成，已生成 index.html")
+print("✅ index.html 已生成")
