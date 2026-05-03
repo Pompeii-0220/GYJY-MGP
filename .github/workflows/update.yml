@@ -2,7 +2,7 @@ name: Update guide prices
 
 on:
   schedule:
-    - cron: '7 * * * *'   # 北京时间每个整点15分（UTC 7分）
+    - cron: '7 * * * *'
   workflow_dispatch:
 
 jobs:
@@ -18,12 +18,12 @@ jobs:
       - name: Install requests
         run: pip install requests
       - name: Run update script
-        run: python update.py   # 真正的 Python 逻辑在这里
+        run: python update.py
       - name: Commit and push if changed
         run: |
           git config --global user.name 'github-actions'
           git config --global user.email 'actions@github.com'
-          git add index.html
+          git add index.html data_output.json app.js
           if ! git diff --cached --quiet; then
             git commit -m "Update guide prices"
             git push
