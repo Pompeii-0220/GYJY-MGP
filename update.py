@@ -33,7 +33,7 @@ for product, ingredients in recipes.items():
             consumers[ing] = []
         consumers[ing].append((product, amount))
 
-# 4. 计算物理需求（终端销量向上游传导，所有分支累加）
+# 4. 计算物理需求（终端销量向上游传导，迭代至收敛）
 virtual_demand = {}
 for item in guide_prices:
     virtual_demand[item] = 0.0
@@ -41,25 +41,35 @@ for name in known_multipliers:
     if name in prod_speed:
         virtual_demand[name] = prod_speed[name]
 
-# 反复迭代直到需求停止增长
 while True:
-    updated = False
-    for product, ingredients in recipes.items():
-        if virtual_demand.get(product, 0) > 0:
-            for ing, amount_per in ingredients:
-                added = virtual_demand[product] * amount_per
-                # 累加到原料上（每次迭代都累加）
-                virtual_demand[ing] = virtual_demand.get(ing, 0.0) + added
-                updated = True
-    if not updated:
+    new_demand = {}
+    for item in guide_prices:
+        if item in consumers:
+            total = 0.0
+            for down_prod, amount_per in consumers[item]:
+                if virtual_demand.get(down_prod, 0) > 0:
+                    total += virtual_demand[down_prod] * amount_per
+            new_demand[item] = total
+        else:
+            # 不是任何人的原料，保持原值（通常为0或终端品固定值）
+            new_demand[item] = virtual_demand[item]
+
+    # 检查是否变化
+    changed = False
+    for k in guide_prices:
+        if abs(new_demand[k] - virtual_demand[k]) > 0.001:
+            changed = True
+            break
+    if not changed:
         break
+    virtual_demand = new_demand
 
 # 5. 按“依赖高度”自底向上计算倍率（保证下游先算完）
-#    先找出每个物品的“高度”（最长路径长度到终端品）
+#    先找出每个物品的“高度”（到终端品的距离）
 height = {}
 for item in guide_prices:
     if item in known_multipliers:
-        height[item] = 0   # 终端品高度为0
+        height[item] = 0
     else:
         height[item] = -1
 
@@ -67,12 +77,12 @@ changed = True
 while changed:
     changed = False
     for product, ingredients in recipes.items():
-        for ing, amount_per in ingredients:
-            if height.get(ing, -1) < height.get(product, -1) + 1:
-                height[ing] = height.get(product, 0) + 1
-                changed = True
+        if height.get(product, -1) >= 0:
+            for ing, amount_per in ingredients:
+                if height.get(ing, -1) < height[product] + 1:
+                    height[ing] = height[product] + 1
+                    changed = True
 
-# 按高度从低到高排序（高度越低的越靠近终端，应该先算）
 sorted_items = sorted(all_items, key=lambda x: height.get(x, 999))
 
 # 开始计算倍率
@@ -95,7 +105,6 @@ for item in sorted_items:
             weighted_mult += demand * multipliers[down_prod]
             total_demand += demand
     if total_demand > 0:
-        # 保留你的调试信息，方便检查结果
         if item == "谷物":
             print(f"\n🔍 谷物倍率 debug (修复后):")
             print(f"  下游列表: {downstream}")
