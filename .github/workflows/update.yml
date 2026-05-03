@@ -1,10 +1,8 @@
 name: Update guide prices
-
 on:
   schedule:
     - cron: '7 * * * *'
   workflow_dispatch:
-
 jobs:
   update:
     runs-on: ubuntu-latest
