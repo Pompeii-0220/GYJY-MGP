@@ -93,7 +93,19 @@ while changed:
             if demand > 0 and down_prod in multipliers:
                 weighted_mult += demand * multipliers[down_prod]
                 total_demand += demand
+
         if total_demand > 0:
+            # ✅ 调试输出（正确缩进，在 if total_demand > 0 内部）
+            if item == "谷物":
+                print(f"\n🔍 谷物倍率 debug:")
+                print(f"  下游列表: {downstream}")
+                for d, a in downstream:
+                    dmd = virtual_demand.get(d, 0)
+                    mlt = multipliers.get(d, "未知")
+                    print(f"    - {d}: demand={dmd}, mult={mlt}, 单位消耗={a}")
+                print(f"  加权总和: {weighted_mult}, 总需求: {total_demand}")
+                print(f"  => 谷物最终倍率: {weighted_mult/total_demand:.4f}")
+
             multipliers[item] = round(weighted_mult / total_demand, 4)
             changed = True
 
