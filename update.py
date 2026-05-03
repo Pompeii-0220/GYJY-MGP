@@ -51,10 +51,8 @@ while True:
                     total += virtual_demand[down_prod] * amount_per
             new_demand[item] = total
         else:
-            # 不是任何人的原料，保持原值（通常为0或终端品固定值）
             new_demand[item] = virtual_demand[item]
 
-    # 检查是否变化
     changed = False
     for k in guide_prices:
         if abs(new_demand[k] - virtual_demand[k]) > 0.001:
@@ -64,10 +62,12 @@ while True:
         break
     virtual_demand = new_demand
 
-# 5. 按“依赖高度”自底向上计算倍率（保证下游先算完）
-#    先找出每个物品的“高度”（到终端品的距离）
+# 5. 按“依赖高度”自底向上计算倍率
+all_items = list(guide_prices.keys())   # ← 这里补上了定义
+
+# 计算高度
 height = {}
-for item in guide_prices:
+for item in all_items:
     if item in known_multipliers:
         height[item] = 0
     else:
@@ -85,7 +85,7 @@ while changed:
 
 sorted_items = sorted(all_items, key=lambda x: height.get(x, 999))
 
-# 开始计算倍率
+# 计算倍率
 multipliers = {}
 multipliers.update(known_multipliers)
 
@@ -104,6 +104,7 @@ for item in sorted_items:
         if demand > 0 and down_prod in multipliers:
             weighted_mult += demand * multipliers[down_prod]
             total_demand += demand
+
     if total_demand > 0:
         if item == "谷物":
             print(f"\n🔍 谷物倍率 debug (修复后):")
