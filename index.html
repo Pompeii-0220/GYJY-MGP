@@ -1,43 +1,109 @@
+
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>市场指导价与利润计算器</title>
+<title>市场指导价</title>
 <style>
   body { font-family: -apple-system, sans-serif; background: #f5f5f5; margin: 0; padding: 20px; }
-  .container { max-width: 1200px; margin: 0 auto; background: white; padding: 25px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
+  .container { max-width: 1100px; margin: 0 auto; background: white; padding: 20px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
   h1 { text-align: center; color: #2c3e50; }
-  .update-time { text-align: center; color: #888; font-size: 14px; margin-bottom: 25px; }
-  .controls { background: #f0f4ff; padding: 15px; border-radius: 8px; margin-bottom: 30px; display: flex; flex-wrap: wrap; gap: 15px; align-items: center; }
-  .controls label { font-weight: 600; margin-right: 5px; }
-  .controls input { width: 80px; padding: 5px; border: 1px solid #ccc; border-radius: 5px; }
-  .category { margin-bottom: 32px; }
-  .category h2 { background: #2c3e50; color: white; padding: 10px 15px; font-size: 18px; border-radius: 6px; margin: 0 0 12px; }
+  .update-time { text-align: center; color: #888; font-size: 14px; margin-bottom: 20px; }
+  .category { margin-bottom: 28px; }
+  .category h2 { background: #2c3e50; color: white; padding: 8px 15px; font-size: 18px; border-radius: 6px; margin: 0 0 10px; }
   table { width: 100%; border-collapse: collapse; font-size: 14px; }
-  th, td { padding: 8px 6px; text-align: left; border-bottom: 1px solid #e0e0e0; }
-  th { background: #fafafa; font-weight: 600; color: #555; }
+  th, td { padding: 8px; text-align: left; border-bottom: 1px solid #e0e0e0; }
+  th { background: #fafafa; font-weight: 600; }
   .price { font-weight: 600; color: #e67e22; }
   .profit { color: #27ae60; }
   .limit { color: #e74c3c; font-weight: 600; }
-  @media (max-width: 600px) { .controls { flex-direction: column; align-items: flex-start; } }
 </style>
 </head>
 <body>
 <div class="container">
-  <h1>🏭 零加成市场指导价 & 利润计算器</h1>
-  <div class="update-time">数据更新时间：<span id="update-time"></span></div>
-  <div class="controls">
-    <label>生产加成% <input id="prod-bonus" type="number" value="0" step="1"></label>
-    <label>销售加成% <input id="sale-bonus" type="number" value="0" step="1"></label>
-    <label>管理减免% <input id="mgt-reduction" type="number" value="0" step="1"></label>
-    <label>其他建筑总等级 <input id="other-levels" type="number" value="500" step="1"></label>
-    <label>其他建筑总工资 <input id="other-wages" type="number" value="50000" step="100"></label>
-    <label>销售利润率% <input id="margin" type="number" value="5" step="0.5"></label>
-    <button onclick="renderAll()">刷新计算</button>
-  </div>
+  <h1>🏭 零加成市场指导价</h1>
+  <div class="update-time">更新时间：<span id="update-time"></span></div>
   <div id="tables-container"></div>
 </div>
-<script src="app.js"></script>
+<script>
+let DATA, items, recipes, prodSpeed, wagePerHour, category;
+
+fetch('data_output.json').then(r=>r.json()).then(json=>{
+    DATA = json;
+    document.getElementById('update-time').innerText = json.update_time;
+    items = json.items;
+    recipes = json.recipes;
+    prodSpeed = json.prod_speed;
+    wagePerHour = json.wage_per_hour || {};
+    category = json.category;
+    renderAll();
+});
+
+function calcGrossProfit(itemName) {
+    const price = items.find(i=>i.name===itemName).price;
+    const speed = prodSpeed[itemName] || 0;
+    if (!speed) return 0;
+    let revenue = speed * price;
+    let matCost = 0;
+    if (recipes[itemName]) {
+        for (let [mat, amt] of recipes[itemName]) {
+            const matPrice = items.find(i=>i.name===mat).price || 0;
+            matCost += speed * amt * matPrice;
+        }
+    }
+    const wage = wagePerHour[itemName] || 0;
+    return revenue - matCost - wage;
+}
+
+function calcMaxLevelAndLimit(itemName) {
+    const wage = wagePerHour[itemName] || 0;
+    if (!wage) return { level: 0, limitProfit: 0 };
+    let level = 1;
+    while (level < 5000) {
+        const next = level + 1;
+        const mgrRateNext = next * 0.0058;   // 管理费率 = 等级 * 0.58%，假设无其他建筑
+        const mgrNext = wage * next * mgrRateNext;
+        const grossNext = calcGrossProfit(itemName) * next;
+        const netNext = grossNext - mgrNext;
+
+        const mgrRateCur = level * 0.0058;
+        const mgrCur = wage * level * mgrRateCur;
+        const grossCur = calcGrossProfit(itemName) * level;
+        const netCur = grossCur - mgrCur;
+
+        if (netNext <= netCur) break;
+        level = next;
+    }
+    const mgrRate = level * 0.0058;
+    const mgr = wage * level * mgrRate;
+    const limitProfit = Math.round(calcGrossProfit(itemName) * level - mgr);
+    return { level: level, limitProfit: limitProfit };
+}
+
+function renderAll() {
+    const cats = ["电力与基础资源","农场产品","牧场产品","加工中间品","中央厨房产品","时装/工业产品"];
+    let html = '';
+    for (let c of cats) {
+        const list = items.filter(i=>category[i.name]===c);
+        if (!list.length) continue;
+        html += `<div class="category"><h2>${c}</h2><table>
+          <tr><th>商品</th><th>指导价</th><th>每级时利润</th><th>最高等级</th><th>极限利润</th></tr>`;
+        for (let it of list) {
+            const profit = Math.round(calcGrossProfit(it.name));
+            const {level, limitProfit} = calcMaxLevelAndLimit(it.name);
+            html += `<tr>
+              <td>${it.name}</td>
+              <td class="price">${it.price.toFixed(2)} 元 (×${it.multiplier.toFixed(2)})</td>
+              <td class="profit">${profit} 元/h</td>
+              <td>${level} 级</td>
+              <td class="limit">${limitProfit} 元/h</td>
+            </tr>`;
+        }
+        html += '</table></div>';
+    }
+    document.getElementById('tables-container').innerHTML = html;
+}
+</script>
 </body>
 </html>
