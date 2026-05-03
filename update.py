@@ -125,9 +125,10 @@ for item, base_price in guide_prices.items():
     mult = multipliers.get(item, 1.0)
     prices[item] = round(base_price * mult, 2)
 
-# 7. 生成 HTML（北京时间）
-beijing_tz = timezone(timedelta(hours=8))
-update_time = datetime.now(tz=beijing_tz).strftime("%Y-%m-%d %H:%M:%S")
+# 7. 生成 HTML（强制北京时间，不受任何环境影响）
+from datetime import timedelta
+update_time = (datetime.utcnow() + timedelta(hours=8)).strftime("%Y-%m-%d %H:%M:%S")
+print(f"🕒 本次生成的更新时间: {update_time}")
 
 cat_order = [
     "电力与基础资源",
