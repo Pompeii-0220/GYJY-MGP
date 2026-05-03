@@ -33,29 +33,41 @@ for product, ingredients in recipes.items():
             consumers[ing] = []
         consumers[ing].append((product, amount))
 
-# 4. 计算物理需求（终端销量向上游传导）
-terminal_speed = {}
-for name, mult in known_multipliers.items():
-    if name in prod_speed:
-        terminal_speed[name] = prod_speed[name]
-
+# 4. 计算物理需求（终端销量向上游传导，所有分支累加）
+#    终端品的需求 = 它们自己的生产速度
 virtual_demand = {}
 for item in guide_prices:
     virtual_demand[item] = 0.0
+for name in known_multipliers:
+    if name in prod_speed:
+        virtual_demand[name] = prod_speed[name]
 
-for term_name, speed in terminal_speed.items():
-    virtual_demand[term_name] = max(virtual_demand[term_name], speed)
-
+#    反复迭代，每个物品的需求 = sum( 下游产品需求 × 单位消耗 )
 changed = True
 while changed:
     changed = False
-    for product, ingredients in recipes.items():
-        if virtual_demand.get(product, 0) > 0:
-            for ing, amount_per in ingredients:
-                added_demand = virtual_demand[product] * amount_per
-                if added_demand > virtual_demand[ing]:
-                    virtual_demand[ing] = added_demand
-                    changed = True
+    new_demand = {}
+    # 终端品需求保持不变（初始值不动）
+    for name in known_multipliers:
+        if name in prod_speed:
+            new_demand[name] = virtual_demand[name]
+
+    for item in guide_prices:
+        if item in consumers:
+            total = 0.0
+            for down_prod, amount_per in consumers[item]:
+                if virtual_demand.get(down_prod, 0) > 0:
+                    total += virtual_demand[down_prod] * amount_per
+            new_demand[item] = total if total > 0 else virtual_demand.get(item, 0.0)
+        else:
+            new_demand[item] = virtual_demand.get(item, 0.0)
+
+    # 检查是否变化
+    for k in guide_prices:
+        if abs(new_demand[k] - virtual_demand[k]) > 0.001:
+            changed = True
+            break
+    virtual_demand = new_demand
 
 # 5. 加权计算倍率
 multipliers = {}
@@ -91,7 +103,7 @@ for item, base_price in guide_prices.items():
     mult = multipliers.get(item, 1.0)
     prices[item] = round(base_price * mult, 2)
 
-# 7. 生成 HTML（使用北京时间）
+# 7. 生成 HTML（北京时间）
 beijing_tz = timezone(timedelta(hours=8))
 update_time = datetime.now(tz=beijing_tz).strftime("%Y-%m-%d %H:%M:%S")
 
