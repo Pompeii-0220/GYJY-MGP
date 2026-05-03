@@ -1,3 +1,4 @@
+
 let DATA, items=[], recipes, prodSpeed, wagePerHour, category, prices;
 
 fetch('data_output.json').then(r=>r.json()).then(json=>{

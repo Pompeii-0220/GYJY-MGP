@@ -1,1 +1,42 @@
-<!DOCTYPE html><html lang="zh-CN">... (保留原本HTML，包含滑块和app.js引用) ...</html>
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>市场指导价与利润计算器</title>
+<style>
+  body { font-family: -apple-system, sans-serif; background: #f5f5f5; margin: 0; padding: 20px; }
+  .container { max-width: 1200px; margin: 0 auto; background: white; padding: 25px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
+  h1 { text-align: center; color: #2c3e50; }
+  .update-time { text-align: center; color: #888; font-size: 14px; margin-bottom: 25px; }
+  .controls { background: #f0f4ff; padding: 15px; border-radius: 8px; margin-bottom: 30px; display: flex; flex-wrap: wrap; gap: 15px; align-items: center; }
+  .controls label { font-weight: 600; margin-right: 5px; }
+  .controls input { width: 80px; padding: 5px; border: 1px solid #ccc; border-radius: 5px; }
+  .category { margin-bottom: 32px; }
+  .category h2 { background: #2c3e50; color: white; padding: 10px 15px; font-size: 18px; border-radius: 6px; margin: 0 0 12px; }
+  table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  th, td { padding: 8px 6px; text-align: left; border-bottom: 1px solid #e0e0e0; }
+  th { background: #fafafa; font-weight: 600; color: #555; }
+  .price { font-weight: 600; color: #e67e22; }
+  .profit { color: #27ae60; }
+  .limit { color: #e74c3c; font-weight: 600; }
+  @media (max-width: 600px) { .controls { flex-direction: column; align-items: flex-start; } }
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>🏭 零加成市场指导价 & 利润计算器</h1>
+  <div class="update-time">数据更新时间：<span id="update-time"></span></div>
+  <div class="controls">
+    <label>生产加成% <input id="prod-bonus" type="number" value="0" step="1"></label>
+    <label>销售加成% <input id="sale-bonus" type="number" value="0" step="1"></label>
+    <label>管理减免% <input id="mgt-reduction" type="number" value="0" step="1"></label>
+    <label>其他建筑总等级 <input id="other-levels" type="number" value="0" step="1"></label>
+    <label>其他建筑总工资 <input id="other-wages" type="number" value="0" step="100"></label>
+    <button onclick="renderAll()">刷新计算</button>
+  </div>
+  <div id="tables-container"></div>
+</div>
+<script src="app.js"></script>
+</body>
+</html>
