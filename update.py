@@ -34,7 +34,6 @@ for product, ingredients in recipes.items():
         consumers[ing].append((product, amount))
 
 # 4. 计算物理需求（终端销量向上游传导，所有分支累加）
-#    终端品的需求 = 它们自己的生产速度
 virtual_demand = {}
 for item in guide_prices:
     virtual_demand[item] = 0.0
@@ -42,72 +41,73 @@ for name in known_multipliers:
     if name in prod_speed:
         virtual_demand[name] = prod_speed[name]
 
-#    反复迭代，每个物品的需求 = sum( 下游产品需求 × 单位消耗 )
+# 反复迭代直到需求停止增长
+while True:
+    updated = False
+    for product, ingredients in recipes.items():
+        if virtual_demand.get(product, 0) > 0:
+            for ing, amount_per in ingredients:
+                added = virtual_demand[product] * amount_per
+                # 累加到原料上（每次迭代都累加）
+                virtual_demand[ing] = virtual_demand.get(ing, 0.0) + added
+                updated = True
+    if not updated:
+        break
+
+# 5. 按“依赖高度”自底向上计算倍率（保证下游先算完）
+#    先找出每个物品的“高度”（最长路径长度到终端品）
+height = {}
+for item in guide_prices:
+    if item in known_multipliers:
+        height[item] = 0   # 终端品高度为0
+    else:
+        height[item] = -1
+
 changed = True
 while changed:
     changed = False
-    new_demand = {}
-    # 终端品需求保持不变（初始值不动）
-    for name in known_multipliers:
-        if name in prod_speed:
-            new_demand[name] = virtual_demand[name]
+    for product, ingredients in recipes.items():
+        for ing, amount_per in ingredients:
+            if height.get(ing, -1) < height.get(product, -1) + 1:
+                height[ing] = height.get(product, 0) + 1
+                changed = True
 
-    for item in guide_prices:
-        if item in consumers:
-            total = 0.0
-            for down_prod, amount_per in consumers[item]:
-                if virtual_demand.get(down_prod, 0) > 0:
-                    total += virtual_demand[down_prod] * amount_per
-            new_demand[item] = total if total > 0 else virtual_demand.get(item, 0.0)
-        else:
-            new_demand[item] = virtual_demand.get(item, 0.0)
+# 按高度从低到高排序（高度越低的越靠近终端，应该先算）
+sorted_items = sorted(all_items, key=lambda x: height.get(x, 999))
 
-    # 检查是否变化
-    for k in guide_prices:
-        if abs(new_demand[k] - virtual_demand[k]) > 0.001:
-            changed = True
-            break
-    virtual_demand = new_demand
-
-# 5. 加权计算倍率
+# 开始计算倍率
 multipliers = {}
 multipliers.update(known_multipliers)
 
-all_items = list(guide_prices.keys())
-changed = True
-while changed:
-    changed = False
-    for item in all_items:
-        if item in multipliers:
-            continue
-        if item not in consumers:
-            multipliers[item] = 1.0
-            changed = True
-            continue
+for item in sorted_items:
+    if item in multipliers:
+        continue
+    if item not in consumers:
+        multipliers[item] = 1.0
+        continue
 
-        downstream = consumers[item]
-        total_demand = 0.0
-        weighted_mult = 0.0
-        for down_prod, amount_per in downstream:
-            demand = virtual_demand.get(down_prod, 0)
-            if demand > 0 and down_prod in multipliers:
-                weighted_mult += demand * multipliers[down_prod]
-                total_demand += demand
-
-        if total_demand > 0:
-            # ✅ 调试输出（正确缩进，在 if total_demand > 0 内部）
-            if item == "谷物":
-                print(f"\n🔍 谷物倍率 debug:")
-                print(f"  下游列表: {downstream}")
-                for d, a in downstream:
-                    dmd = virtual_demand.get(d, 0)
-                    mlt = multipliers.get(d, "未知")
-                    print(f"    - {d}: demand={dmd}, mult={mlt}, 单位消耗={a}")
-                print(f"  加权总和: {weighted_mult}, 总需求: {total_demand}")
-                print(f"  => 谷物最终倍率: {weighted_mult/total_demand:.4f}")
-
-            multipliers[item] = round(weighted_mult / total_demand, 4)
-            changed = True
+    downstream = consumers[item]
+    total_demand = 0.0
+    weighted_mult = 0.0
+    for down_prod, amount_per in downstream:
+        demand = virtual_demand.get(down_prod, 0)
+        if demand > 0 and down_prod in multipliers:
+            weighted_mult += demand * multipliers[down_prod]
+            total_demand += demand
+    if total_demand > 0:
+        # 保留你的调试信息，方便检查结果
+        if item == "谷物":
+            print(f"\n🔍 谷物倍率 debug (修复后):")
+            print(f"  下游列表: {downstream}")
+            for d, a in downstream:
+                dmd = virtual_demand.get(d, 0)
+                mlt = multipliers.get(d, "未知")
+                print(f"    - {d}: demand={dmd}, mult={mlt}, 单位消耗={a}")
+            print(f"  加权总和: {weighted_mult}, 总需求: {total_demand}")
+            print(f"  => 谷物最终倍率: {weighted_mult/total_demand:.4f}")
+        multipliers[item] = round(weighted_mult / total_demand, 4)
+    else:
+        multipliers[item] = 1.0
 
 # 6. 最终价格
 prices = {}
