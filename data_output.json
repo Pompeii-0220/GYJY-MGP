@@ -1,10 +1,10 @@
 {
-  "update_time": "2026-05-07 19:15:27",
-  "unified_multiplier": 1.3215,
+  "update_time": "2026-05-07 22:15:25",
+  "unified_multiplier": 1.323,
   "items": [
     {
       "name": "电力",
-      "price": 3.22,
+      "price": 3.23,
       "retail_price": null,
       "cat": "电力与基础资源"
     },
@@ -16,7 +16,7 @@
     },
     {
       "name": "原油",
-      "price": 316.18,
+      "price": 316.54,
       "retail_price": null,
       "cat": "电力与基础资源"
     },
@@ -28,289 +28,289 @@
     },
     {
       "name": "苹果",
-      "price": 35.18,
+      "price": 35.22,
       "retail_price": 65,
       "cat": "农场产品"
     },
     {
       "name": "可可",
-      "price": 28.0,
+      "price": 28.03,
       "retail_price": null,
       "cat": "农场产品"
     },
     {
       "name": "咖啡豆",
-      "price": 14.39,
+      "price": 14.41,
       "retail_price": null,
       "cat": "农场产品"
     },
     {
       "name": "棉花",
-      "price": 21.54,
+      "price": 21.57,
       "retail_price": null,
       "cat": "农场产品"
     },
     {
       "name": "谷物",
-      "price": 10.6,
+      "price": 10.61,
       "retail_price": null,
       "cat": "农场产品"
     },
     {
       "name": "葡萄",
-      "price": 44.22,
-      "retail_price": 103,
+      "price": 44.27,
+      "retail_price": 100,
       "cat": "农场产品"
     },
     {
       "name": "木材",
-      "price": 66.07,
+      "price": 66.15,
       "retail_price": null,
       "cat": "农场产品"
     },
     {
       "name": "橘子",
-      "price": 36.55,
-      "retail_price": 89,
+      "price": 36.59,
+      "retail_price": 92,
       "cat": "农场产品"
     },
     {
       "name": "甘蔗",
-      "price": 24.32,
+      "price": 24.34,
       "retail_price": null,
       "cat": "农场产品"
     },
     {
       "name": "蔬菜",
-      "price": 41.34,
+      "price": 41.38,
       "retail_price": null,
       "cat": "农场产品"
     },
     {
       "name": "鸡蛋",
-      "price": 19.49,
-      "retail_price": 31,
+      "price": 19.51,
+      "retail_price": 32,
       "cat": "牧场产品"
     },
     {
       "name": "牛奶",
-      "price": 119.08,
-      "retail_price": 166,
+      "price": 119.22,
+      "retail_price": 164,
       "cat": "牧场产品"
     },
     {
       "name": "皮革",
-      "price": 381.91,
+      "price": 382.35,
       "retail_price": null,
       "cat": "牧场产品"
     },
     {
       "name": "牛",
-      "price": 2031.12,
+      "price": 2033.47,
       "retail_price": null,
       "cat": "牧场产品"
     },
     {
       "name": "猪",
-      "price": 1975.62,
+      "price": 1977.9,
       "retail_price": null,
       "cat": "牧场产品"
     },
     {
       "name": "苹果汁",
-      "price": 381.91,
-      "retail_price": 730,
+      "price": 382.35,
+      "retail_price": 728,
       "cat": "加工中间品"
     },
     {
       "name": "姜汁汽水",
-      "price": 663.29,
-      "retail_price": 1399,
+      "price": 664.06,
+      "retail_price": 1384,
       "cat": "加工中间品"
     },
     {
       "name": "橙汁",
-      "price": 472.95,
-      "retail_price": 1050,
+      "price": 473.49,
+      "retail_price": 1046,
       "cat": "加工中间品"
     },
     {
       "name": "香肠",
-      "price": 231.06,
-      "retail_price": 231,
+      "price": 231.33,
+      "retail_price": 223,
       "cat": "加工中间品"
     },
     {
       "name": "牛排",
-      "price": 576.26,
-      "retail_price": 720,
+      "price": 576.93,
+      "retail_price": 705,
       "cat": "加工中间品"
     },
     {
       "name": "糖",
-      "price": 228.6,
+      "price": 228.87,
       "retail_price": null,
       "cat": "加工中间品"
     },
     {
       "name": "黄油",
-      "price": 683.05,
-      "retail_price": 1341,
+      "price": 683.84,
+      "retail_price": 1315,
       "cat": "加工中间品"
     },
     {
       "name": "芝士",
-      "price": 2342.99,
-      "retail_price": 1999,
+      "price": 2345.7,
+      "retail_price": 2007,
       "cat": "加工中间品"
     },
     {
       "name": "巧克力",
-      "price": 2999.77,
-      "retail_price": 4502,
+      "price": 3003.24,
+      "retail_price": 4483,
       "cat": "加工中间品"
     },
     {
       "name": "面条",
-      "price": 958.38,
+      "price": 959.49,
       "retail_price": null,
       "cat": "加工中间品"
     },
     {
       "name": "植物油",
-      "price": 628.64,
+      "price": 629.37,
       "retail_price": null,
       "cat": "加工中间品"
     },
     {
       "name": "披萨",
-      "price": 8398.04,
-      "retail_price": 11671,
+      "price": 8407.74,
+      "retail_price": 11686,
       "cat": "加工中间品"
     },
     {
       "name": "面团",
-      "price": 2447.59,
+      "price": 2450.42,
       "retail_price": null,
       "cat": "加工中间品"
     },
     {
       "name": "面包",
-      "price": 3180.3,
-      "retail_price": 3444,
+      "price": 3183.97,
+      "retail_price": 3428,
       "cat": "加工中间品"
     },
     {
       "name": "苹果派",
-      "price": 4440.55,
-      "retail_price": 5577,
+      "price": 4445.68,
+      "retail_price": 5591,
       "cat": "加工中间品"
     },
     {
       "name": "咖喱角",
-      "price": 7665.94,
-      "retail_price": 14776,
+      "price": 7674.79,
+      "retail_price": 14691,
       "cat": "中央厨房产品"
     },
     {
       "name": "汉堡",
-      "price": 28052.51,
-      "retail_price": 54595,
+      "price": 28084.91,
+      "retail_price": 53862,
       "cat": "中央厨房产品"
     },
     {
       "name": "千层面",
-      "price": 25023.66,
-      "retail_price": 36230,
+      "price": 25052.56,
+      "retail_price": 36244,
       "cat": "中央厨房产品"
     },
     {
       "name": "肉丸",
-      "price": 30653.19,
-      "retail_price": 44598,
+      "price": 30688.59,
+      "retail_price": 44616,
       "cat": "中央厨房产品"
     },
     {
       "name": "混合果汁",
-      "price": 29444.03,
-      "retail_price": 59554,
+      "price": 29478.04,
+      "retail_price": 58945,
       "cat": "中央厨房产品"
     },
     {
       "name": "沙拉",
-      "price": 10766.15,
-      "retail_price": 15673,
+      "price": 10778.58,
+      "retail_price": 15378,
       "cat": "中央厨房产品"
     },
     {
       "name": "酱汁",
-      "price": 15021.33,
+      "price": 15038.68,
       "retail_price": null,
       "cat": "中央厨房产品"
     },
     {
       "name": "棉布",
-      "price": 80.66,
+      "price": 80.76,
       "retail_price": null,
       "cat": "时装/工业产品"
     },
     {
       "name": "裙子",
-      "price": 359.35,
-      "retail_price": 546,
+      "price": 359.77,
+      "retail_price": 533,
       "cat": "时装/工业产品"
     },
     {
       "name": "手套",
-      "price": 289.06,
-      "retail_price": 868,
+      "price": 289.4,
+      "retail_price": 858,
       "cat": "时装/工业产品"
     },
     {
       "name": "手袋",
-      "price": 503.94,
-      "retail_price": 1190,
+      "price": 504.52,
+      "retail_price": 1236,
       "cat": "时装/工业产品"
     },
     {
       "name": "高跟鞋",
-      "price": 491.25,
+      "price": 491.82,
       "retail_price": 911,
       "cat": "时装/工业产品"
     },
     {
       "name": "运动鞋",
-      "price": 172.59,
-      "retail_price": 329,
+      "price": 172.79,
+      "retail_price": 330,
       "cat": "时装/工业产品"
     },
     {
       "name": "内衣",
-      "price": 130.63,
-      "retail_price": 357,
+      "price": 130.78,
+      "retail_price": 356,
       "cat": "时装/工业产品"
     },
     {
       "name": "塑料",
-      "price": 124.79,
+      "price": 124.93,
       "retail_price": null,
       "cat": "时装/工业产品"
     },
     {
       "name": "动物饲料",
-      "price": 153.97,
+      "price": 154.14,
       "retail_price": null,
       "cat": "加工中间品"
     },
     {
       "name": "咖啡粉",
-      "price": 482.3,
-      "retail_price": 646,
+      "price": 482.86,
+      "retail_price": 649,
       "cat": "加工中间品"
     },
     {
       "name": "面粉",
-      "price": 248.2,
+      "price": 248.49,
       "retail_price": null,
       "cat": "加工中间品"
     }
@@ -1085,34 +1085,34 @@
     "出售手袋": "时装/工业产品"
   },
   "retail_prices": {
-    "牛奶": 166,
-    "黄油": 1341,
-    "咖啡粉": 646,
-    "牛排": 720,
-    "芝士": 1999,
-    "苹果汁": 730,
-    "香肠": 231,
-    "鸡蛋": 31,
-    "千层面": 36230,
-    "咖喱角": 14776,
-    "汉堡": 54595,
-    "沙拉": 15673,
-    "混合果汁": 59554,
-    "肉丸": 44598,
-    "面包": 3444,
-    "内衣": 357,
-    "手套": 868,
-    "手袋": 1190,
-    "裙子": 546,
-    "运动鞋": 329,
+    "牛奶": 164,
+    "黄油": 1315,
+    "咖啡粉": 649,
+    "牛排": 705,
+    "芝士": 2007,
+    "苹果汁": 728,
+    "香肠": 223,
+    "鸡蛋": 32,
+    "千层面": 36244,
+    "咖喱角": 14691,
+    "汉堡": 53862,
+    "沙拉": 15378,
+    "混合果汁": 58945,
+    "肉丸": 44616,
+    "面包": 3428,
+    "内衣": 356,
+    "手套": 858,
+    "手袋": 1236,
+    "裙子": 533,
+    "运动鞋": 330,
     "高跟鞋": 911,
-    "姜汁汽水": 1399,
-    "巧克力": 4502,
-    "披萨": 11671,
-    "橘子": 89,
-    "橙汁": 1050,
+    "姜汁汽水": 1384,
+    "巧克力": 4483,
+    "披萨": 11686,
+    "橘子": 92,
+    "橙汁": 1046,
     "苹果": 65,
-    "苹果派": 5577,
-    "葡萄": 103
+    "苹果派": 5591,
+    "葡萄": 100
   }
 }
