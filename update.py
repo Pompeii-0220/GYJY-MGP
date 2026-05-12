@@ -5,7 +5,13 @@ import copy
 
 print("脚本启动...")
 
-# ========== 1. 加载静态数据库 ==========
+# ================= 可调参数 =================
+RETAIL_CEILING = 0.98          # 零售品指导价上限（占API基础价的比例）
+TOLERANCE = 0.15               # 利润均衡目标（变异系数 ≤ 15%）
+ADJUST_STEP = 0.02             # 每次调价幅度
+MAX_ITER = 500                 # 最大迭代次数
+
+# ================= 1. 加载静态数据 =================
 with open("game_data.json", "r", encoding="utf-8") as f:
     gd = json.load(f)
 
@@ -13,16 +19,19 @@ prod_data = gd["production"]
 retail_data = gd["retail"]
 mgmt_rate = gd["management_rate"]
 
-# ========== 2. 获取 API 零售基础价（仅用于零售品价格上限约束） ==========
+# ================= 2. 抓取API数据 =================
 api_url = "http://gyjy.xmonecode.com/api/public/retail-prices"
 resp = requests.get(api_url, timeout=15)
 resp.raise_for_status()
 api_json = resp.json()
 retail_rows = api_json.get("rows", [])
+
 retail_price_map = {item["name"]: item["retailPrice"] for item in retail_rows}
 retail_base_price_map = {item["name"]: item["basePrice"] for item in retail_rows}
 
-# ========== 3. 辅助函数 ==========
+print(f"API数据获取成功，零售品数量：{len(retail_rows)}")
+
+# ================= 3. 辅助函数 =================
 def compute_material_cost(product, prices):
     if product not in prod_data:
         return 0.0
@@ -36,6 +45,8 @@ def compute_material_cost(product, prices):
     return cost
 
 def compute_limit_profit(product, price, prices):
+    if product not in prod_data:
+        return 0, 0
     info = prod_data[product]
     wage = info["wage"]
     output = info["output"]
@@ -49,15 +60,31 @@ def compute_limit_profit(product, price, prices):
     limit = gross * n_opt - wage * (n_opt ** 2) * mgmt_rate
     return round(limit, 0), n_opt
 
-# ========== 4. 初始化价格（成本加成，作为迭代起点） ==========
+def retail_limit_profit(item_name, prices):
+    """计算零售建筑的极限利润（元/h）"""
+    for shop, data in retail_data.items():
+        if item_name in data["items"]:
+            wage = data["wage"]
+            retail_price = retail_price_map.get(item_name, 0)
+            buy_price = prices.get(item_name, 0)
+            sales = data["items"][item_name]
+            gross = sales * (retail_price - buy_price) - wage
+            if gross <= 0:
+                return 0, 0
+            n_opt = int(gross / (2 * wage * mgmt_rate) - 0.5)
+            if n_opt < 1:
+                n_opt = 1
+            limit = gross * n_opt - wage * (n_opt ** 2) * mgmt_rate
+            return round(limit, 0), n_opt
+    return 0, 0
+
+# ================= 4. 初始化所有价格 =================
 prices = {}
-# 电力基准
 elec_info = prod_data.get("电力")
 if elec_info:
     labor = elec_info["wage"] / elec_info["output"]
     prices["电力"] = round(labor * 1.15, 2)
 
-# 按依赖顺序计算所有产品的初始价格
 remaining = set(prod_data.keys()) - {"电力"}
 while remaining:
     solved = set()
@@ -75,11 +102,10 @@ while remaining:
             mat_cost += per_unit * prices[ing]
         if all_known:
             labor = info["wage"] / info["output"]
-            # 初始利润率设为15%
             prices[p] = round((mat_cost + labor) * 1.15, 2)
-            # 零售品价格上限约束
+            # 应用零售品上限
             if p in retail_base_price_map:
-                ceiling = retail_base_price_map[p] * 0.98
+                ceiling = retail_base_price_map[p] * RETAIL_CEILING
                 prices[p] = min(prices[p], ceiling)
             solved.add(p)
     if not solved:
@@ -90,66 +116,82 @@ while remaining:
         break
     remaining -= solved
 
-print(f"初始价格设置完毕，商品数: {len(prices)}")
+print(f"初始价格设置完毕，商品数：{len(prices)}")
 
-# ========== 5. 迭代均衡算法 ==========
-MAX_ITER = 800
-TOLERANCE = 0.12  # 变异系数目标12%
-ADJUST_STEP = 0.02
-
+# ================= 5. 迭代均衡（生产+零售） =================
 for iteration in range(MAX_ITER):
-    # 计算所有生产建筑的极限利润
-    limits = {}
+    # 收集所有生产与零售的极限利润
+    all_limits = {}
     for pname in prod_data:
         limit, _ = compute_limit_profit(pname, prices[pname], prices)
         if limit > 0:
-            limits[pname] = limit
+            all_limits[pname] = limit
 
-    if len(limits) < 10:
+    for rname in retail_price_map:
+        limit, _ = retail_limit_profit(rname, prices)
+        if limit > 0:
+            all_limits[f"零售_{rname}"] = limit
+
+    if len(all_limits) < 10:
         print("盈利建筑过少，调价空间不足，退出")
         break
 
-    # 计算变异系数
-    lvals = list(limits.values())
+    lvals = list(all_limits.values())
     mean = sum(lvals) / len(lvals)
     variance = sum((x - mean) ** 2 for x in lvals) / len(lvals)
     cv = (variance ** 0.5) / mean
 
     if cv < TOLERANCE:
-        print(f"第{iteration+1}次迭代，变异系数{cv:.4f} 已达标，停止")
+        print(f"第{iteration+1}次迭代，变异系数={cv:.4f} 已达标")
         break
 
-    # 找到利润最高和最低的建筑
-    max_prod = max(limits, key=limits.get)
-    min_prod = min(limits, key=limits.get)
+    # 寻找利润最高与最低的条目
+    max_key = max(all_limits, key=all_limits.get)
+    min_key = min(all_limits, key=all_limits.get)
 
-    # 提低降高
-    prices[min_prod] = round(prices[min_prod] * (1 + ADJUST_STEP), 2)
-    prices[max_prod] = round(prices[max_prod] * (1 - ADJUST_STEP), 2)
+    # 调价逻辑：压低过高利润，抬升过低利润
+    if max_key.startswith("零售_"):
+        rname = max_key.replace("零售_", "")
+        # 零售利润过高 → 提高进货价（即生产指导价）
+        if rname in prices:
+            prices[rname] = round(prices[rname] * (1 + ADJUST_STEP), 2)
+    else:
+        # 生产利润过高 → 降低其产品价格
+        prices[max_key] = round(prices[max_key] * (1 - ADJUST_STEP), 2)
 
-    # 下限：不低于原料成本
-    min_mat = compute_material_cost(min_prod, prices)
-    if prices[min_prod] < min_mat:
-        prices[min_prod] = round(min_mat * 1.05, 2)
+    if min_key.startswith("零售_"):
+        rname = min_key.replace("零售_", "")
+        # 零售利润过低 → 降低进货价（让利给零售）
+        if rname in prices:
+            prices[rname] = round(prices[rname] * (1 - ADJUST_STEP), 2)
+    else:
+        # 生产利润过低 → 提高其产品价格
+        prices[min_key] = round(prices[min_key] * (1 + ADJUST_STEP), 2)
+        # 若已达价格上限，则转而压低该产品的原料价格（传导压力）
+        if min_key in retail_base_price_map and prices[min_key] >= retail_base_price_map[min_key] * RETAIL_CEILING:
+            recipe = prod_data.get(min_key, {}).get("recipe", {})
+            for ing in recipe:
+                prices[ing] = round(prices[ing] * (1 - ADJUST_STEP * 0.5), 2)
 
-    # 上限：零售品不超基础价98%
-    if max_prod in retail_base_price_map:
-        ceiling = retail_base_price_map[max_prod] * 0.98
-        prices[max_prod] = min(prices[max_prod], ceiling)
-    if min_prod in retail_base_price_map:
-        ceiling = retail_base_price_map[min_prod] * 0.98
-        prices[min_prod] = min(prices[min_prod], ceiling)
+    # 重新施加价格下限（不低于原料成本）与上限（零售品）
+    for p in list(prices.keys()):
+        mat_min = compute_material_cost(p, prices)
+        if prices[p] < mat_min:
+            prices[p] = round(mat_min * 1.02, 2)
+        if p in retail_base_price_map:
+            ceiling = retail_base_price_map[p] * RETAIL_CEILING
+            prices[p] = min(prices[p], ceiling)
 
     if iteration % 100 == 0:
-        print(f"迭代 {iteration+1}, CV: {cv:.4f}")
+        print(f"迭代 {iteration+1}, CV: {cv:.4f}, 调整: {min_key} ↔ {max_key}")
 
-# 保存静态均衡价表
+# 保存均衡价格表
 static_prices = copy.deepcopy(prices)
 with open("static_equilibrium_prices.json", "w", encoding="utf-8") as f:
     json.dump(static_prices, f, indent=2, ensure_ascii=False)
-print("静态均衡价格表已生成并保存至 static_equilibrium_prices.json")
+print("静态均衡价格表已保存")
 
-# ========== 6. 统一市场倍率 ==========
+# ================= 6. 统一市场倍率 =================
 total_w = 0.0
 sum_m = 0.0
 for item in retail_rows:
@@ -168,7 +210,9 @@ for item in retail_rows:
 unified_mult = sum_m / total_w if total_w > 0 else 1.0
 final_prices = {name: round(bp * unified_mult, 2) for name, bp in prices.items()}
 
-# ========== 7. 输出 data_output.json ==========
+print(f"统一市场倍率：{unified_mult:.4f}")
+
+# ================= 7. 输出 data_output.json =================
 beijing_tz = timezone(timedelta(hours=8))
 update_time = datetime.now(tz=beijing_tz).strftime("%Y-%m-%d %H:%M:%S")
 
@@ -192,26 +236,15 @@ building_profits = {}
 for pname in prod_data:
     limit, opt = compute_limit_profit(pname, final_prices[pname], final_prices)
     building_profits[pname] = {"limit": limit, "opt_level": opt}
-
 for shop, data in retail_data.items():
     for rname in data["items"]:
         if rname in retail_price_map:
-            wage = data["wage"]
-            retail_price = retail_price_map[rname]
-            buy_price = final_prices.get(rname, 0)
-            sales = data["items"][rname]
-            gross = sales * (retail_price - buy_price) - wage
-            if gross > 0:
-                n_opt = int(gross / (2 * wage * mgmt_rate) - 0.5)
-                if n_opt < 1: n_opt = 1
-                limit = gross * n_opt - wage * (n_opt ** 2) * mgmt_rate
-                building_profits[f"零售_{rname}"] = {"limit": round(limit, 0), "opt_level": n_opt}
-            else:
-                building_profits[f"零售_{rname}"] = {"limit": 0, "opt_level": 0}
+            limit, opt = retail_limit_profit(rname, final_prices)
+            building_profits[f"零售_{rname}"] = {"limit": limit, "opt_level": opt}
 
 output["building_profits"] = building_profits
 
 with open("data_output.json", "w", encoding="utf-8") as f:
     json.dump(output, f, ensure_ascii=False, indent=2)
 
-print(f"✅ 统一倍率 {unified_mult:.4f}，动态指导价已更新")
+print("✅ 动态指导价与利润表已更新。")
