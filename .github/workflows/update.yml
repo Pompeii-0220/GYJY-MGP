@@ -1,6 +1,8 @@
 name: Update guide prices
+
 on:
   workflow_dispatch:
+
 jobs:
   update:
     runs-on: ubuntu-latest
@@ -19,8 +21,8 @@ jobs:
         run: |
           git config --global user.name 'github-actions'
           git config --global user.email 'actions@github.com'
-          git add index.html data_output.json app.js
+          git add index.html data_output.json game_data.json
           if ! git diff --cached --quiet; then
-            git commit -m "Update guide prices"
+            git commit -m "Update dynamic guide prices"
             git push
           fi
