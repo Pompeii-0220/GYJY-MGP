@@ -155,7 +155,11 @@ for margin in [0.15, 0.18, 0.20, 0.22, 0.25]:
             best_prices = prices
 
 print(f"最优毛利率: {best_margin*100:.1f}%，差异: {best_diff*100:.1f}%")
-prices = best_prices
+if best_prices is None:
+    print("警告：未找到任何正利润建筑，使用默认毛利率20%")
+    prices = compute_prices(0.20, retail_price_map)
+else:
+    prices = best_prices
 
 # ---------- 输出文件 ----------
 beijing_tz = timezone(timedelta(hours=8))
