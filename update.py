@@ -2,39 +2,46 @@ import json
 import requests
 from datetime import datetime, timezone, timedelta
 import copy
+import traceback
+
+print("脚本开始执行...")
 
 # ========== 1. 加载静态数据库 ==========
-with open("game_data.json", "r", encoding="utf-8") as f:
-    gd = json.load(f)
+try:
+    with open("game_data.json", "r", encoding="utf-8") as f:
+        gd = json.load(f)
+    print("game_data.json 加载成功")
+except Exception as e:
+    print(f"加载 game_data.json 失败: {e}")
+    raise
 
 prod_data = gd["production"]
 retail_data = gd["retail"]
 mgmt_rate = gd["management_rate"]
 
 # ========== 2. 抓取 API 实时数据 ==========
-api_url = "http://gyjy.xmonecode.com/api/public/retail-prices"
-resp = requests.get(api_url)
-resp.raise_for_status()
-api_json = resp.json()
-retail_rows = api_json.get("rows", [])
+try:
+    api_url = "http://gyjy.xmonecode.com/api/public/retail-prices"
+    resp = requests.get(api_url, timeout=15)
+    resp.raise_for_status()
+    api_json = resp.json()
+    retail_rows = api_json.get("rows", [])
+    print(f"API 数据获取成功，零售品数量: {len(retail_rows)}")
+except Exception as e:
+    print(f"API 请求失败: {e}")
+    raise
+
 retail_price_map = {item["name"]: item["retailPrice"] for item in retail_rows}
 retail_base_price_map = {item["name"]: item["basePrice"] for item in retail_rows}
 
 # ========== 3. 核心计算函数 ==========
 def compute_prices(profit_rate, complexity_bonus=0.0):
-    """
-    根据给定参数，成本加成计算所有非零售品的均衡价。
-    profit_rate: 基础利润率
-    complexity_bonus: 每个额外原料的利润率加成
-    """
     prices = {}
-    # 电力基准价：劳动力成本 * (1 + 利润率)
     elec_info = prod_data.get("电力")
     if elec_info:
         labor = elec_info["wage"] / elec_info["output"]
         prices["电力"] = round(labor * (1 + profit_rate), 2)
 
-    # 按依赖顺序逐层求解
     remaining = set(prod_data.keys()) - {"电力"}
     while remaining:
         solved = set()
@@ -52,18 +59,15 @@ def compute_prices(profit_rate, complexity_bonus=0.0):
                 mat_cost += per_unit * prices[ing]
             if all_known:
                 labor = info["wage"] / info["output"]
-                # 计算该产品的专用利润率（基础 + 复杂度加成）
                 num_ingredients = len(recipe)
                 effective_rate = profit_rate + complexity_bonus * max(0, num_ingredients - 1)
                 price = round((mat_cost + labor) * (1 + effective_rate), 2)
-                # 零售品价格上限设定为 API 基础价的 95%
                 if p in retail_base_price_map:
                     ceiling = retail_base_price_map[p] * 0.95
                     price = min(price, ceiling)
                 prices[p] = price
                 solved.add(p)
         if not solved:
-            # 出现死锁（通常为循环依赖），使用劳动力成本*2作为保底
             for p in remaining:
                 if p not in prices:
                     labor = prod_data[p]["wage"] / prod_data[p]["output"]
@@ -73,8 +77,6 @@ def compute_prices(profit_rate, complexity_bonus=0.0):
     return prices
 
 def calc_limit_profit(item_name, prices):
-    """计算单个建筑在给定价格下的极限利润（元/h）"""
-    # 生产建筑
     if item_name in prod_data:
         info = prod_data[item_name]
         wage = info["wage"]
@@ -95,7 +97,6 @@ def calc_limit_profit(item_name, prices):
         limit = gross * n_opt - wage * (n_opt ** 2) * mgmt_rate
         return round(limit, 0), n_opt, round(gross, 2)
 
-    # 零售建筑（用于后续展示，不参与优化目标）
     for shop, data in retail_data.items():
         if item_name in data["items"]:
             wage = data["wage"]
@@ -116,7 +117,6 @@ def calc_limit_profit(item_name, prices):
 
 # ========== 4. 优化器 ==========
 def evaluate_params(profit_rate, complexity_bonus):
-    """计算给定参数下的极限利润变异系数"""
     prices = compute_prices(profit_rate, complexity_bonus)
     limits = []
     for pname in prod_data:
@@ -129,16 +129,14 @@ def evaluate_params(profit_rate, complexity_bonus):
     if mean == 0:
         return float('inf')
     variance = sum((x - mean) ** 2 for x in limits) / len(limits)
-    cv = (variance ** 0.5) / mean  # 变异系数
+    cv = (variance ** 0.5) / mean
     return cv
 
 def find_optimal_params():
-    """网格搜索 + 局部爬山寻找最优利润率和复杂度加成"""
     best_cv = float('inf')
     best_profit = 0.15
     best_bonus = 0.0
 
-    # 网格搜索范围：基础利润率10%~30%，复杂度加成0~15%
     for pr in [0.10, 0.12, 0.15, 0.18, 0.20, 0.22, 0.25, 0.28, 0.30]:
         for cb in [0.0, 0.02, 0.05, 0.08, 0.10, 0.12, 0.15]:
             cv = evaluate_params(pr, cb)
@@ -147,7 +145,6 @@ def find_optimal_params():
                 best_profit = pr
                 best_bonus = cb
 
-    # 局部爬山微调
     step = 0.01
     for _ in range(10):
         improved = False
@@ -168,24 +165,24 @@ def find_optimal_params():
 
     return best_profit, best_bonus, best_cv
 
-# 尝试加载上一次保存的最优参数，若无则重新寻优
+# ========== 5. 读取或生成最优参数 ==========
 try:
     with open("optimal_params.json", "r") as f:
         opt = json.load(f)
         best_profit = opt["profit_rate"]
         best_bonus = opt["complexity_bonus"]
         print(f"使用已保存的最优参数：利润率{best_profit*100:.1f}%，复杂度加成{best_bonus*100:.1f}%")
-except:
-    print("正在优化均衡参数...（可能需要十几秒）")
+except FileNotFoundError:
+    print("开始优化均衡参数...（可能需要十几秒）")
     best_profit, best_bonus, best_cv = find_optimal_params()
     with open("optimal_params.json", "w") as f:
         json.dump({"profit_rate": best_profit, "complexity_bonus": best_bonus}, f)
     print(f"优化完成：利润率{best_profit*100:.1f}%，复杂度加成{best_bonus*100:.1f}%，变异系数{best_cv:.4f}")
 
-# ========== 5. 生成均衡指导价 ==========
+# ========== 6. 生成均衡指导价 ==========
 base_prices = compute_prices(best_profit, best_bonus)
 
-# ========== 6. 统一市场倍率 ==========
+# ========== 7. 统一市场倍率 ==========
 total_w = 0.0
 sum_m = 0.0
 for item in retail_rows:
@@ -204,7 +201,7 @@ for item in retail_rows:
 unified_mult = sum_m / total_w if total_w > 0 else 1.0
 final_prices = {name: round(bp * unified_mult, 2) for name, bp in base_prices.items()}
 
-# ========== 7. 输出结果 ==========
+# ========== 8. 输出结果 ==========
 beijing_tz = timezone(timedelta(hours=8))
 update_time = datetime.now(tz=beijing_tz).strftime("%Y-%m-%d %H:%M:%S")
 
