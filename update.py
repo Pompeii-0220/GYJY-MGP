@@ -47,6 +47,11 @@ def material_cost(product_name, prices):
         total += amount * prices.get(ing, 0)
     return total
 
+def labor_cost(product_name):
+    if product_name not in prod_data: return 0.0
+    info = prod_data[product_name]
+    return info["wage"] / info["output"]
+
 def limit_profit(product_name, prices, is_retail=False):
     if is_retail:
         for shop, data in retail_data.items():
@@ -138,13 +143,16 @@ for iteration in range(200):
     if iteration % 50 == 0:
         print(f"迭代 {iteration+1}, CV={cv:.4f}, 调整 {max_prod}↓, {min_prod}↑")
 
-# 最终保底
+# ========== 5. 最终保底（修正：包含劳动力成本） ==========
 for p in prod_data:
-    if p == "电力" or p in retail_base_price_map: continue
-    mat = material_cost(p, prices)
-    if prices[p] < mat * 1.05: prices[p] = round(mat * 1.05, 2)
+    if p == "电力" or p in retail_base_price_map:
+        continue
+    total_cost = material_cost(p, prices) + labor_cost(p)
+    min_price = round(total_cost * 1.05, 2)  # 至少覆盖总成本+5%利润
+    if prices[p] < min_price:
+        prices[p] = min_price
 
-# ========== 5. 统一市场倍率 ==========
+# ========== 6. 统一市场倍率 ==========
 total_weight = 0.0
 sum_mult = 0.0
 for item in retail_rows:
@@ -166,7 +174,7 @@ for name, bp in prices.items():
         dynamic = min(dynamic, round(retail_price_map[name] * 0.98, 2))
     final_prices[name] = dynamic
 
-# ========== 6. 输出 ==========
+# ========== 7. 输出 ==========
 beijing_tz = timezone(timedelta(hours=8))
 update_time = datetime.now(tz=beijing_tz).strftime("%Y-%m-%d %H:%M:%S")
 
