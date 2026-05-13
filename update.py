@@ -1,10 +1,23 @@
 import json
 import requests
 from datetime import datetime, timezone, timedelta
-import numpy as np
-from scipy.optimize import minimize
 
-print("脚本启动...")
+# ========== 旧产业链均衡价（1.0倍率基石） ==========
+BASE_GUIDE_PRICES = {
+    "电力": 2.44, "水": 3.85, "原油": 239.26, "种子": 3.10,
+    "苹果": 26.62, "可可": 21.19, "咖啡豆": 10.89, "棉花": 16.30,
+    "谷物": 8.02, "葡萄": 33.46, "木材": 50.00, "橘子": 27.66,
+    "甘蔗": 18.40, "蔬菜": 31.28, "鸡蛋": 14.75, "牛奶": 90.11,
+    "皮革": 289, "牛": 1537, "猪": 1495, "苹果汁": 289,
+    "姜汁汽水": 501.93, "橙汁": 357.89, "香肠": 174.85, "牛排": 436.07,
+    "糖": 172.99, "黄油": 516.88, "芝士": 1773, "巧克力": 2270,
+    "面条": 725.23, "植物油": 475.71, "披萨": 6355, "面团": 1852.15,
+    "面包": 2406.61, "苹果派": 3360.27, "咖喱角": 5801, "汉堡": 21228,
+    "千层面": 18936, "肉丸": 23196, "混合果汁": 22281, "沙拉": 8147,
+    "酱汁": 11367, "棉布": 61.04, "裙子": 271.93, "手套": 218.74,
+    "手袋": 381.34, "高跟鞋": 371.74, "运动鞋": 130.60, "内衣": 98.85,
+    "塑料": 94.43, "动物饲料": 116.51, "咖啡粉": 364.97, "面粉": 187.82,
+}
 
 # ========== 1. 加载数据 ==========
 with open("game_data.json", "r", encoding="utf-8") as f:
@@ -14,126 +27,62 @@ prod_data = gd["production"]
 retail_data = gd["retail"]
 mgmt_rate = gd["management_rate"]
 
-api_url = "http://gyjy.xmonecode.com/api/public/retail-prices"
-resp = requests.get(api_url, timeout=15)
+# ========== 2. API零售价 ==========
+url = "http://gyjy.xmonecode.com/api/public/retail-prices"
+resp = requests.get(url, timeout=15)
 resp.raise_for_status()
 api_json = resp.json()
 retail_rows = api_json.get("rows", [])
 retail_price_map = {item["name"]: item["retailPrice"] for item in retail_rows}
 retail_base_price_map = {item["name"]: item["basePrice"] for item in retail_rows}
 
-print(f"API 零售品数量: {len(retail_rows)}")
+# ========== 3. 为新产品补充基石价（成本加成，15%利润率） ==========
+prices = dict(BASE_GUIDE_PRICES)
 
-# ========== 2. 准备变量 ==========
-# 所有非零售品的名字（作为优化变量）
-var_names = [p for p in prod_data if p not in retail_base_price_map]
-# 电力单独处理（作为锚点，不参与优化）
-if "电力" in var_names:
-    var_names.remove("电力")
-
-# 初始价格：成本加成15%
-def init_prices():
-    p = {}
+# 电力基准（如果不在旧表中，则用成本加成）
+if "电力" not in prices:
     elec = prod_data["电力"]
     labor = elec["wage"] / elec["output"]
-    p["电力"] = labor * 1.15
-    remaining = set(prod_data.keys()) - {"电力"}
-    while remaining:
-        solved = set()
-        for prod in remaining:
-            info = prod_data[prod]
-            mat_cost = 0.0
-            unknown = False
-            for ing, amt in info["recipe"].items():
-                per = amt / info.get("batch", 1)
-                if ing not in p:
-                    unknown = True
-                    break
-                mat_cost += per * p[ing]
-            if unknown:
-                continue
-            labor = info["wage"] / info["output"]
-            price = (mat_cost + labor) * 1.15
-            if prod in retail_base_price_map:
-                price = retail_base_price_map[prod] * 0.98
-            p[prod] = price
-            solved.add(prod)
-        if not solved:
-            for prod in remaining:
-                if prod not in p:
-                    p[prod] = prod_data[prod]["wage"] / prod_data[prod]["output"] * 2.0
-            break
-        remaining -= solved
-    return p
+    prices["电力"] = round(labor * 1.15, 2)
 
-# ========== 3. 目标函数 ==========
-def objective(x):
-    prices = init_prices()
-    for name, val in zip(var_names, x):
-        prices[name] = val
-    # 计算所有建筑的极限利润
-    limits = []
-    for pname in prod_data:
-        info = prod_data[pname]
-        wage = info["wage"]
-        output = info["output"]
-        price = prices.get(pname, 1.0)
+# 按依赖顺序计算缺失产品的成本加成价
+remaining = set(prod_data.keys()) - set(prices.keys())
+while remaining:
+    solved = set()
+    for p in remaining:
+        info = prod_data[p]
+        recipe = info["recipe"]
+        batch = info.get("batch", 1)
+        all_known = True
         mat = 0.0
-        for ing, amt in info["recipe"].items():
-            per = amt / info.get("batch", 1)
-            mat += per * prices.get(ing, 1.0)
-        gross = output * (price - mat) - wage
-        if gross <= 0:
-            continue
-        n_opt = int(gross / (2 * wage * mgmt_rate) - 0.5)
-        if n_opt < 1:
-            n_opt = 1
-        limit = gross * n_opt - wage * (n_opt ** 2) * mgmt_rate
-        limits.append(limit)
-    if len(limits) < 5:
-        return 1e12
-    mean = np.mean(limits)
-    std = np.std(limits)
-    cv = std / mean  # 变异系数
-    return cv
+        for ing, amount in recipe.items():
+            if ing not in prices:
+                all_known = False
+                break
+            per = amount / batch
+            mat += per * prices[ing]
+        if all_known:
+            labor = info["wage"] / info["output"]
+            price = round((mat + labor) * 1.15, 2)
+            # 如果是有零售价的新产品，直接取零售基础价作为基石
+            if p in retail_base_price_map:
+                price = retail_base_price_map[p]
+            prices[p] = price
+            solved.add(p)
+    if not solved:
+        for p in remaining:
+            if p not in prices:
+                labor = prod_data[p]["wage"] / prod_data[p]["output"]
+                prices[p] = round(labor * 2.0, 2)
+        break
+    remaining -= solved
 
-# ========== 4. 约束：每个中间品价格不低于原料成本 ==========
-def build_constraints():
-    cons = []
-    for i, name in enumerate(var_names):
-        def constraint(x, i=i, name=name):
-            prices = init_prices()
-            for j, n in enumerate(var_names):
-                prices[n] = x[j]
-            # 计算原料成本
-            info = prod_data[name]
-            mat = 0.0
-            for ing, amt in info["recipe"].items():
-                per = amt / info.get("batch", 1)
-                mat += per * prices.get(ing, 1.0)
-            return x[i] - mat  # 价格 >= 原料成本
-        cons.append({'type': 'ineq', 'fun': constraint})
-    return cons
-
-# ========== 5. 运行优化 ==========
-x0 = [init_prices()[n] for n in var_names]
-bounds = [(1e-3, 1e9) for _ in var_names]
-constraints = build_constraints()
-
-print("开始 scipy 优化...（可能需要1-2分钟）")
-res = minimize(objective, x0, method='SLSQP', bounds=bounds, constraints=constraints,
-               options={'maxiter': 500, 'ftol': 1e-6})
-
-# ========== 6. 生成最终价格 ==========
-final_base_prices = init_prices()
-for name, val in zip(var_names, res.x):
-    final_base_prices[name] = max(val, 1e-3)
-
-# ========== 7. 统一市场倍率 ==========
-total_w = sum_m = 0.0
+# ========== 4. 统一市场倍率 ==========
+total_w = 0.0
+sum_m = 0.0
 for item in retail_rows:
     name = item["name"]
-    if name not in final_base_prices:
+    if name not in prices:
         continue
     speed = 0
     for shop, data in retail_data.items():
@@ -143,19 +92,31 @@ for item in retail_rows:
     if speed > 0:
         sum_m += item["multiplier"] * speed
         total_w += speed
-unified_mult = sum_m / total_w if total_w > 0 else 1.0
-final_prices = {n: round(bp * unified_mult, 2) for n, bp in final_base_prices.items()}
 
-# ========== 8. 极限利润输出 ==========
-def calc_limit(pname, prices):
-    if pname in prod_data:
-        info = prod_data[pname]
+unified_mult = sum_m / total_w if total_w > 0 else 1.0
+
+# ========== 5. 动态指导价（加零售安全帽） ==========
+final_prices = {}
+for name, bp in prices.items():
+    dynamic = round(bp * unified_mult, 2)
+    # 零售品价格不超过当前实际零售价的98%
+    if name in retail_price_map:
+        cap = round(retail_price_map[name] * 0.98, 2)
+        dynamic = min(dynamic, cap)
+    final_prices[name] = dynamic
+
+# ========== 6. 极限利润 ==========
+def calc_limit(item_name, prices):
+    if item_name in prod_data:
+        info = prod_data[item_name]
         wage = info["wage"]
         output = info["output"]
-        price = prices.get(pname, 0)
+        price = prices.get(item_name, 0)
+        recipe = info["recipe"]
+        batch = info.get("batch", 1)
         mat = 0.0
-        for ing, amt in info["recipe"].items():
-            per = amt / info.get("batch", 1)
+        for ing, amount in recipe.items():
+            per = amount / batch
             mat += per * prices.get(ing, 0)
         gross = output * (price - mat) - wage
         if gross <= 0:
@@ -164,20 +125,34 @@ def calc_limit(pname, prices):
         if n_opt < 1: n_opt = 1
         limit = gross * n_opt - wage * (n_opt ** 2) * mgmt_rate
         return round(limit, 0), n_opt
+
+    for shop, data in retail_data.items():
+        if item_name in data["items"]:
+            wage = data["wage"]
+            retail_price = retail_price_map.get(item_name, 0)
+            buy_price = prices.get(item_name, 0)
+            sales = data["items"][item_name]
+            gross = sales * (retail_price - buy_price) - wage
+            if gross <= 0:
+                return 0, 0
+            n_opt = int(gross / (2 * wage * mgmt_rate) - 0.5)
+            if n_opt < 1: n_opt = 1
+            limit = gross * n_opt - wage * (n_opt ** 2) * mgmt_rate
+            return round(limit, 0), n_opt
     return 0, 0
 
-# ========== 9. 输出文件 ==========
-beijing = timezone(timedelta(hours=8))
-update_time = datetime.now(tz=beijing).strftime("%Y-%m-%d %H:%M:%S")
+# ========== 7. 输出 ==========
+beijing_tz = timezone(timedelta(hours=8))
+update_time = datetime.now(tz=beijing_tz).strftime("%Y-%m-%d %H:%M:%S")
+
 output = {
     "update_time": update_time,
     "unified_multiplier": round(unified_mult, 4),
-    "optimization_success": bool(res.success),
-    "final_cv": float(objective(res.x)),
     "items": [],
     "retail_prices": retail_price_map
 }
-all_items = set(final_prices.keys()) | {n for r in retail_data.values() for n in r["items"]}
+
+all_items = set(final_prices.keys()) | {name for r in retail_data.values() for name in r["items"]}
 for item in all_items:
     output["items"].append({
         "name": item,
@@ -185,6 +160,7 @@ for item in all_items:
         "retail_price": retail_price_map.get(item),
         "is_retail": item in retail_price_map
     })
+
 building_profits = {}
 for p in prod_data:
     limit, opt = calc_limit(p, final_prices)
@@ -194,9 +170,10 @@ for shop, data in retail_data.items():
         if rname in retail_price_map:
             limit, opt = calc_limit(rname, final_prices)
             building_profits[f"零售_{rname}"] = {"limit": limit, "opt_level": opt}
+
 output["building_profits"] = building_profits
 
 with open("data_output.json", "w", encoding="utf-8") as f:
     json.dump(output, f, ensure_ascii=False, indent=2)
 
-print(f"优化完成：成功={res.success}, 最终CV={objective(res.x):.4f}, 统一倍率={unified_mult:.4f}")
+print(f"✅ 统一倍率 {unified_mult:.4f}，指导价已生成（旧均衡基石 + 成本加成）")
