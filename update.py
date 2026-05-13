@@ -17,10 +17,9 @@ retail_rows = api_json.get("rows", [])
 retail_price_map = {item["name"]: item["retailPrice"] for item in retail_rows}
 retail_base_price_map = {item["name"]: item["basePrice"] for item in retail_rows}
 
-# ========== 计算基石价 ==========
+# ========== 1. 计算基石价 ==========
 PR = 0.15
 prices = {}
-# 电力
 prices["电力"] = round(prod_data["电力"]["wage"] / prod_data["电力"]["output"] * (1 + PR), 2)
 
 remaining = set(prod_data.keys()) - {"电力"}
@@ -39,8 +38,6 @@ while remaining:
         if not ok: continue
         labor = info["wage"] / info["output"]
         price = round((mat + labor) * (1 + PR), 2)
-        if p in retail_base_price_map:
-            price = retail_base_price_map[p]      # ← 直接取 API 基础价
         prices[p] = price
         solved.add(p)
     if not solved:
@@ -50,10 +47,11 @@ while remaining:
         break
     remaining -= solved
 
-# 保底：价格 ≥ 原料成本 × 1.05
+# ========== 2. 价格保底（仅非零售品） ==========
 for _ in range(3):
     for p in prod_data:
-        if p == "电力": continue
+        if p == "电力" or p in retail_base_price_map:  # 零售品跳过保底
+            continue
         info = prod_data[p]
         mat = 0.0
         for ing, amt in info["recipe"].items():
@@ -61,7 +59,11 @@ for _ in range(3):
         if prices[p] < mat * 1.05:
             prices[p] = round(mat * 1.05, 2)
 
-# 统一倍率
+# ========== 3. 零售品强制锁定API基础价 ==========
+for p in retail_base_price_map:
+    prices[p] = retail_base_price_map[p]
+
+# ========== 4. 统一市场倍率 ==========
 tw = sw = 0.0
 for r in retail_rows:
     n = r["name"]
@@ -74,6 +76,7 @@ for r in retail_rows:
         sw += r["multiplier"] * sp; tw += sp
 um = sw / tw if tw else 1.0
 
+# ========== 5. 动态指导价（含安全帽0.98） ==========
 final = {}
 for n, bp in prices.items():
     d = round(bp * um, 2)
@@ -81,7 +84,7 @@ for n, bp in prices.items():
         d = min(d, round(retail_price_map[n] * 0.98, 2))
     final[n] = d
 
-# 极限利润
+# ========== 6. 极限利润计算 ==========
 def lim(it, prc, retail=False):
     if retail:
         for d in retail_data.values():
@@ -111,6 +114,7 @@ def lim(it, prc, retail=False):
         if n < 1: n = 1
         return round(gr*n - wage*n*n*mgmt_rate, 0), n, round(gr,2)
 
+# ========== 7. 输出 ==========
 beijing = timezone(timedelta(hours=8))
 out = {
     "update_time": datetime.now(tz=beijing).strftime("%Y-%m-%d %H:%M:%S"),
