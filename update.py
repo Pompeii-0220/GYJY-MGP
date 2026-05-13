@@ -27,7 +27,7 @@ prod_data = gd["production"]
 retail_data = gd["retail"]
 mgmt_rate = gd["management_rate"]
 
-# ========== 2. API零售价 ==========
+# ========== 2. API 零售价 ==========
 url = "http://gyjy.xmonecode.com/api/public/retail-prices"
 resp = requests.get(url, timeout=15)
 resp.raise_for_status()
@@ -36,10 +36,10 @@ retail_rows = api_json.get("rows", [])
 retail_price_map = {item["name"]: item["retailPrice"] for item in retail_rows}
 retail_base_price_map = {item["name"]: item["basePrice"] for item in retail_rows}
 
-# ========== 3. 为新产品补充基石价（成本加成，15%利润率） ==========
+# ========== 3. 为所有产品生成1倍率基石价 ==========
 prices = dict(BASE_GUIDE_PRICES)
 
-# 电力基准（如果不在旧表中，则用成本加成）
+# 电力基准
 if "电力" not in prices:
     elec = prod_data["电力"]
     labor = elec["wage"] / elec["output"]
@@ -64,9 +64,7 @@ while remaining:
         if all_known:
             labor = info["wage"] / info["output"]
             price = round((mat + labor) * 1.15, 2)
-            # 如果是有零售价的新产品，直接取零售基础价作为基石
-            if p in retail_base_price_map:
-                price = retail_base_price_map[p]
+            # 不再用API基础价替代，完全成本加成
             prices[p] = price
             solved.add(p)
     if not solved:
@@ -99,13 +97,12 @@ unified_mult = sum_m / total_w if total_w > 0 else 1.0
 final_prices = {}
 for name, bp in prices.items():
     dynamic = round(bp * unified_mult, 2)
-    # 零售品价格不超过当前实际零售价的98%
     if name in retail_price_map:
         cap = round(retail_price_map[name] * 0.98, 2)
         dynamic = min(dynamic, cap)
     final_prices[name] = dynamic
 
-# ========== 6. 极限利润（计算用，前端暂不展示） ==========
+# ========== 6. 极限利润计算（可供前端扩展） ==========
 def calc_limit(item_name, prices):
     if item_name in prod_data:
         info = prod_data[item_name]
@@ -156,13 +153,12 @@ all_items = set(final_prices.keys()) | {name for r in retail_data.values() for n
 for item in all_items:
     output["items"].append({
         "name": item,
-        "price": final_prices.get(item, 0),          # 动态指导价
-        "base_price": prices.get(item, 0),           # 1倍率基石价（新增）
+        "price": final_prices.get(item, 0),
+        "base_price": prices.get(item, 0),  # 1.0倍率基石价
         "retail_price": retail_price_map.get(item),
         "is_retail": item in retail_price_map
     })
 
-# 极限利润表（保留计算，前端如有需要可调用）
 building_profits = {}
 for p in prod_data:
     limit, opt = calc_limit(p, final_prices)
@@ -178,4 +174,4 @@ output["building_profits"] = building_profits
 with open("data_output.json", "w", encoding="utf-8") as f:
     json.dump(output, f, ensure_ascii=False, indent=2)
 
-print(f"✅ 统一倍率 {unified_mult:.4f}，指导价已生成（旧均衡基石 + 成本加成）")
+print(f"✅ 统一倍率 {unified_mult:.4f}，指导价已生成（旧均衡基石 + 全成本加成）")
