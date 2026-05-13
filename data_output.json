@@ -1,911 +1,911 @@
 {
-  "update_time": "2026-05-13 09:34:55",
-  "unified_multiplier": 1.525,
+  "update_time": "2026-05-13 10:09:15",
+  "unified_multiplier": 1.5373,
   "items": [
     {
-      "name": "建筑预构件",
-      "price": 583405.83,
-      "retail_price": null,
-      "is_retail": false
-    },
-    {
-      "name": "推土机",
-      "price": 906227.44,
-      "retail_price": null,
-      "is_retail": false
-    },
-    {
-      "name": "卡车",
-      "price": 31684.31,
-      "retail_price": 42524,
-      "is_retail": true
-    },
-    {
-      "name": "姜汁汽水",
-      "price": 592.36,
-      "retail_price": 1449,
-      "is_retail": true
-    },
-    {
-      "name": "亚轨道二级",
-      "price": 61849373.41,
-      "retail_price": null,
-      "is_retail": false
-    },
-    {
-      "name": "可可",
-      "price": 23.35,
-      "retail_price": null,
-      "is_retail": false
-    },
-    {
-      "name": "豪华车内饰",
-      "price": 317455.15,
-      "retail_price": null,
-      "is_retail": false
-    },
-    {
-      "name": "石灰石",
-      "price": 10.57,
-      "retail_price": null,
-      "is_retail": false
-    },
-    {
-      "name": "喷气发动机",
-      "price": 5214569.27,
-      "retail_price": null,
-      "is_retail": false
-    },
-    {
-      "name": "亚轨道火箭",
-      "price": 210227934.83,
-      "retail_price": null,
-      "is_retail": false
-    },
-    {
-      "name": "化合物",
-      "price": 956.25,
-      "retail_price": null,
-      "is_retail": false
-    },
-    {
-      "name": "钢筋",
-      "price": 8369.53,
-      "retail_price": null,
-      "is_retail": false
-    },
-    {
-      "name": "鸡蛋",
-      "price": 35.87,
-      "retail_price": 38,
-      "is_retail": true
-    },
-    {
-      "name": "咖啡豆",
-      "price": 23.33,
-      "retail_price": null,
-      "is_retail": false
-    },
-    {
-      "name": "电视机",
-      "price": 8728.13,
-      "retail_price": 11232,
-      "is_retail": true
-    },
-    {
-      "name": "窗户",
-      "price": 694.96,
-      "retail_price": 917,
-      "is_retail": true
-    },
-    {
-      "name": "显示屏",
-      "price": 9243.67,
-      "retail_price": null,
-      "is_retail": false
-    },
-    {
-      "name": "棉花",
-      "price": 19.35,
-      "retail_price": null,
-      "is_retail": false
-    },
-    {
-      "name": "塑料",
-      "price": 626.91,
-      "retail_price": null,
-      "is_retail": false
-    },
-    {
-      "name": "座舱",
-      "price": 5485748.98,
-      "retail_price": null,
-      "is_retail": false
-    },
-    {
-      "name": "矿物",
-      "price": 91.96,
-      "retail_price": null,
-      "is_retail": false
-    },
-    {
-      "name": "豪华飞机",
-      "price": 59456026.1,
-      "retail_price": null,
-      "is_retail": false
-    },
-    {
-      "name": "苹果派",
-      "price": 1942.91,
-      "retail_price": 2122,
-      "is_retail": true
-    },
-    {
-      "name": "混合果汁",
-      "price": 13899.25,
-      "retail_price": 15033,
-      "is_retail": true
-    },
-    {
-      "name": "皮革",
-      "price": 16369.35,
-      "retail_price": null,
-      "is_retail": false
-    },
-    {
-      "name": "笔记本电脑",
-      "price": 11956.34,
-      "retail_price": 16046,
-      "is_retail": true
-    },
-    {
-      "name": "谷物",
-      "price": 20.83,
-      "retail_price": null,
-      "is_retail": false
-    },
-    {
-      "name": "智能手机",
-      "price": 6501.26,
-      "retail_price": 8617,
-      "is_retail": true
-    },
-    {
-      "name": "星际飞船",
-      "price": 432170718.99,
-      "retail_price": null,
-      "is_retail": false
-    },
-    {
-      "name": "硅材",
-      "price": 68.66,
-      "retail_price": null,
-      "is_retail": false
-    },
-    {
-      "name": "名牌手表",
-      "price": 13462.84,
-      "retail_price": 17795,
-      "is_retail": true
-    },
-    {
-      "name": "香肠",
-      "price": 242.12,
-      "retail_price": 231,
-      "is_retail": true
-    },
-    {
-      "name": "高跟鞋",
-      "price": 567.93,
-      "retail_price": 667,
-      "is_retail": true
-    },
-    {
-      "name": "牛",
-      "price": 14185.27,
-      "retail_price": null,
-      "is_retail": false
-    },
-    {
-      "name": "内燃机",
-      "price": 90888.71,
-      "retail_price": null,
-      "is_retail": false
-    },
-    {
-      "name": "甲烷",
-      "price": 187.93,
-      "retail_price": null,
-      "is_retail": false
-    },
-    {
-      "name": "金矿石",
-      "price": 282.64,
-      "retail_price": null,
-      "is_retail": false
-    },
-    {
-      "name": "棉布",
-      "price": 91.35,
-      "retail_price": null,
-      "is_retail": false
-    },
-    {
-      "name": "汽油",
-      "price": 366.16,
-      "retail_price": 374,
-      "is_retail": true
-    },
-    {
-      "name": "黏土",
-      "price": 6.59,
-      "retail_price": null,
-      "is_retail": false
-    },
-    {
-      "name": "种子",
-      "price": 6.79,
-      "retail_price": null,
-      "is_retail": false
-    },
-    {
-      "name": "面粉",
-      "price": 703.9,
-      "retail_price": null,
-      "is_retail": false
-    },
-    {
-      "name": "钢材",
-      "price": 3621.08,
-      "retail_price": null,
-      "is_retail": false
-    },
-    {
-      "name": "苹果",
-      "price": 30.46,
-      "retail_price": 75,
-      "is_retail": true
-    },
-    {
-      "name": "碳纤维复合材",
-      "price": 746.48,
-      "retail_price": null,
-      "is_retail": false
-    },
-    {
-      "name": "钢筋混凝土",
-      "price": 44524.88,
-      "retail_price": null,
-      "is_retail": false
-    },
-    {
-      "name": "铝材",
-      "price": 340.74,
-      "retail_price": null,
-      "is_retail": false
-    },
-    {
-      "name": "柴油",
-      "price": 366.16,
-      "retail_price": 438,
-      "is_retail": true
-    },
-    {
-      "name": "砖块",
-      "price": 21.18,
-      "retail_price": 44,
-      "is_retail": true
-    },
-    {
-      "name": "蔬菜",
-      "price": 50.02,
-      "retail_price": null,
-      "is_retail": false
-    },
-    {
-      "name": "机器人",
-      "price": 113818.42,
-      "retail_price": null,
-      "is_retail": false
-    },
-    {
-      "name": "无人机",
-      "price": 6755.33,
-      "retail_price": 9066,
-      "is_retail": true
-    },
-    {
-      "name": "木材",
-      "price": 51.33,
-      "retail_price": null,
-      "is_retail": false
-    },
-    {
-      "name": "咖喱角",
-      "price": 5380.35,
-      "retail_price": 5566,
-      "is_retail": true
-    },
-    {
-      "name": "喷气客机",
-      "price": 143755992.94,
-      "retail_price": null,
-      "is_retail": false
-    },
-    {
-      "name": "碳纤维",
-      "price": 41.76,
-      "retail_price": null,
-      "is_retail": false
-    },
-    {
-      "name": "沙子",
-      "price": 8.13,
-      "retail_price": null,
-      "is_retail": false
-    },
-    {
-      "name": "原油",
-      "price": 246.31,
-      "retail_price": null,
-      "is_retail": false
-    },
-    {
-      "name": "甘蔗",
-      "price": 23.53,
-      "retail_price": null,
-      "is_retail": false
-    },
-    {
-      "name": "车身",
-      "price": 66317.77,
-      "retail_price": null,
-      "is_retail": false
-    },
-    {
-      "name": "经济燃油车",
-      "price": 19429.06,
-      "retail_price": 26040,
-      "is_retail": true
-    },
-    {
-      "name": "千层面",
-      "price": 10760.71,
-      "retail_price": 13153,
-      "is_retail": true
-    },
-    {
-      "name": "人造卫星",
-      "price": 131762325.82,
-      "retail_price": null,
-      "is_retail": false
-    },
-    {
-      "name": "单引擎飞机",
-      "price": 21540451.06,
-      "retail_price": null,
-      "is_retail": false
-    },
-    {
-      "name": "豪华燃油车",
-      "price": 28097.4,
-      "retail_price": 37710,
-      "is_retail": true
-    },
-    {
-      "name": "平板电脑",
-      "price": 10461.8,
-      "retail_price": 14041,
-      "is_retail": true
-    },
-    {
-      "name": "沙拉",
-      "price": 6127.63,
-      "retail_price": 6105,
-      "is_retail": true
-    },
-    {
-      "name": "汉堡",
-      "price": 13151.98,
-      "retail_price": 15045,
-      "is_retail": true
-    },
-    {
-      "name": "基本内饰",
-      "price": 46412.64,
-      "retail_price": null,
-      "is_retail": false
-    },
-    {
-      "name": "糖",
-      "price": 177.53,
-      "retail_price": null,
-      "is_retail": false
-    },
-    {
-      "name": "肉丸",
-      "price": 10013.44,
-      "retail_price": 13379,
-      "is_retail": true
-    },
-    {
-      "name": "猪",
-      "price": 4727.91,
-      "retail_price": null,
-      "is_retail": false
-    },
-    {
       "name": "火箭燃料",
-      "price": 447.08,
+      "price": 450.68,
       "retail_price": null,
       "is_retail": false
-    },
-    {
-      "name": "黄油",
-      "price": 567.93,
-      "retail_price": 459,
-      "is_retail": true
-    },
-    {
-      "name": "豪华电动车",
-      "price": 39605.38,
-      "retail_price": 53155,
-      "is_retail": true
-    },
-    {
-      "name": "裙子",
-      "price": 585.86,
-      "retail_price": 571,
-      "is_retail": true
-    },
-    {
-      "name": "披萨",
-      "price": 3736.36,
-      "retail_price": 4195,
-      "is_retail": true
-    },
-    {
-      "name": "木板",
-      "price": 82.49,
-      "retail_price": 110,
-      "is_retail": true
-    },
-    {
-      "name": "面条",
-      "price": 3529.7,
-      "retail_price": null,
-      "is_retail": false
-    },
-    {
-      "name": "运动鞋",
-      "price": 479.75,
-      "retail_price": 520,
-      "is_retail": true
-    },
-    {
-      "name": "苹果汁",
-      "price": 539.53,
-      "retail_price": 461,
-      "is_retail": true
-    },
-    {
-      "name": "项链",
-      "price": 24982.78,
-      "retail_price": 20012,
-      "is_retail": true
-    },
-    {
-      "name": "牛奶",
-      "price": 215.21,
-      "retail_price": 168,
-      "is_retail": true
     },
     {
       "name": "手套",
-      "price": 503.66,
-      "retail_price": 572,
+      "price": 507.72,
+      "retail_price": 585,
       "is_retail": true
+    },
+    {
+      "name": "钢材",
+      "price": 3650.26,
+      "retail_price": null,
+      "is_retail": false
     },
     {
       "name": "金条",
-      "price": 115723.56,
-      "retail_price": null,
-      "is_retail": false
-    },
-    {
-      "name": "精密电子元件",
-      "price": 566046.35,
-      "retail_price": null,
-      "is_retail": false
-    },
-    {
-      "name": "电子元件",
-      "price": 2599.48,
-      "retail_price": null,
-      "is_retail": false
-    },
-    {
-      "name": "内衣",
-      "price": 203.12,
-      "retail_price": 317,
-      "is_retail": true
-    },
-    {
-      "name": "手袋",
-      "price": 702.44,
-      "retail_price": 710,
-      "is_retail": true
-    },
-    {
-      "name": "巧克力",
-      "price": 1345.09,
-      "retail_price": 1489,
-      "is_retail": true
-    },
-    {
-      "name": "芝士",
-      "price": 642.65,
-      "retail_price": 654,
-      "is_retail": true
-    },
-    {
-      "name": "飞行计算机",
-      "price": 5381032.13,
-      "retail_price": null,
-      "is_retail": false
-    },
-    {
-      "name": "橘子",
-      "price": 31.1,
-      "retail_price": 91,
-      "is_retail": true
-    },
-    {
-      "name": "植物油",
-      "price": 1152.32,
-      "retail_price": null,
-      "is_retail": false
-    },
-    {
-      "name": "燃料储罐",
-      "price": 285280.81,
-      "retail_price": null,
-      "is_retail": false
-    },
-    {
-      "name": "咖啡粉",
-      "price": 255.57,
-      "retail_price": 260,
-      "is_retail": true
-    },
-    {
-      "name": "电力",
-      "price": 2.44,
-      "retail_price": null,
-      "is_retail": false
-    },
-    {
-      "name": "机身",
-      "price": 69403.93,
-      "retail_price": null,
-      "is_retail": false
-    },
-    {
-      "name": "铝土矿",
-      "price": 118.82,
-      "retail_price": null,
-      "is_retail": false
-    },
-    {
-      "name": "显示器",
-      "price": 5477.5,
-      "retail_price": 7351,
-      "is_retail": true
-    },
-    {
-      "name": "酱汁",
-      "price": 6385.5,
-      "retail_price": null,
-      "is_retail": false
-    },
-    {
-      "name": "面团",
-      "price": 8176.78,
+      "price": 116656.01,
       "retail_price": null,
       "is_retail": false
     },
     {
       "name": "动物饲料",
-      "price": 1019.48,
-      "retail_price": null,
-      "is_retail": false
-    },
-    {
-      "name": "电动马达",
-      "price": 34675.91,
-      "retail_price": null,
-      "is_retail": false
-    },
-    {
-      "name": "火箭发动机",
-      "price": 15892503.42,
-      "retail_price": null,
-      "is_retail": false
-    },
-    {
-      "name": "姿态控制器",
-      "price": 544928.67,
-      "retail_price": null,
-      "is_retail": false
-    },
-    {
-      "name": "面包",
-      "price": 1434.76,
-      "retail_price": 1641,
-      "is_retail": true
-    },
-    {
-      "name": "电池",
-      "price": 8548.17,
-      "retail_price": null,
-      "is_retail": false
-    },
-    {
-      "name": "水泥",
-      "price": 74.41,
-      "retail_price": 96,
-      "is_retail": true
-    },
-    {
-      "name": "处理器",
-      "price": 4198.05,
-      "retail_price": null,
-      "is_retail": false
-    },
-    {
-      "name": "星舰",
-      "price": 3018578510.86,
-      "retail_price": null,
-      "is_retail": false
-    },
-    {
-      "name": "橙汁",
-      "price": 380.41,
-      "retail_price": 1060,
-      "is_retail": true
-    },
-    {
-      "name": "玻璃",
-      "price": 170.64,
-      "retail_price": null,
-      "is_retail": false
-    },
-    {
-      "name": "乙醇",
-      "price": 349.19,
-      "retail_price": null,
-      "is_retail": false
-    },
-    {
-      "name": "工具",
-      "price": 1221.04,
-      "retail_price": 1638,
-      "is_retail": true
-    },
-    {
-      "name": "固体燃料助推器",
-      "price": 349167.59,
-      "retail_price": null,
-      "is_retail": false
-    },
-    {
-      "name": "经济电动车",
-      "price": 28844.68,
-      "retail_price": 38421,
-      "is_retail": true
-    },
-    {
-      "name": "轨道助推器",
-      "price": 558639481.83,
-      "retail_price": null,
-      "is_retail": false
-    },
-    {
-      "name": "铁矿石",
-      "price": 63.23,
+      "price": 1027.69,
       "retail_price": null,
       "is_retail": false
     },
     {
       "name": "隔热板",
-      "price": 171059.95,
+      "price": 172438.28,
       "retail_price": null,
       "is_retail": false
     },
     {
-      "name": "机翼",
-      "price": 55569.85,
-      "retail_price": null,
-      "is_retail": false
-    },
-    {
-      "name": "葡萄",
-      "price": 37.39,
-      "retail_price": 106,
+      "name": "内衣",
+      "price": 204.76,
+      "retail_price": 323,
       "is_retail": true
     },
     {
-      "name": "车载电脑",
-      "price": 37416.47,
+      "name": "精密电子元件",
+      "price": 570607.31,
       "retail_price": null,
       "is_retail": false
     },
     {
-      "name": "离子推进器",
-      "price": 11041022.26,
+      "name": "人造卫星",
+      "price": 132824010.34,
+      "retail_price": null,
+      "is_retail": false
+    },
+    {
+      "name": "玻璃",
+      "price": 172.01,
+      "retail_price": null,
+      "is_retail": false
+    },
+    {
+      "name": "电子元件",
+      "price": 2620.43,
+      "retail_price": null,
+      "is_retail": false
+    },
+    {
+      "name": "乙醇",
+      "price": 352.0,
+      "retail_price": null,
+      "is_retail": false
+    },
+    {
+      "name": "亚轨道二级",
+      "price": 62347729.24,
+      "retail_price": null,
+      "is_retail": false
+    },
+    {
+      "name": "车身",
+      "price": 66852.13,
+      "retail_price": null,
+      "is_retail": false
+    },
+    {
+      "name": "电力",
+      "price": 2.46,
+      "retail_price": null,
+      "is_retail": false
+    },
+    {
+      "name": "星际飞船",
+      "price": 435652965.97,
+      "retail_price": null,
+      "is_retail": false
+    },
+    {
+      "name": "植物油",
+      "price": 1161.61,
+      "retail_price": null,
+      "is_retail": false
+    },
+    {
+      "name": "亚轨道火箭",
+      "price": 211921861.7,
+      "retail_price": null,
+      "is_retail": false
+    },
+    {
+      "name": "座舱",
+      "price": 5529950.8,
+      "retail_price": null,
+      "is_retail": false
+    },
+    {
+      "name": "面粉",
+      "price": 709.57,
+      "retail_price": null,
+      "is_retail": false
+    },
+    {
+      "name": "橙汁",
+      "price": 383.47,
+      "retail_price": 1079,
+      "is_retail": true
+    },
+    {
+      "name": "平板电脑",
+      "price": 10546.1,
+      "retail_price": 14044,
+      "is_retail": true
+    },
+    {
+      "name": "甲烷",
+      "price": 189.45,
+      "retail_price": null,
+      "is_retail": false
+    },
+    {
+      "name": "柴油",
+      "price": 369.11,
+      "retail_price": 440,
+      "is_retail": true
+    },
+    {
+      "name": "苹果",
+      "price": 30.39,
+      "retail_price": 79,
+      "is_retail": true
+    },
+    {
+      "name": "咖啡粉",
+      "price": 257.63,
+      "retail_price": 260,
+      "is_retail": true
+    },
+    {
+      "name": "运动鞋",
+      "price": 483.61,
+      "retail_price": 527,
+      "is_retail": true
+    },
+    {
+      "name": "窗户",
+      "price": 700.56,
+      "retail_price": 903,
+      "is_retail": true
+    },
+    {
+      "name": "黄油",
+      "price": 572.5,
+      "retail_price": 482,
+      "is_retail": true
+    },
+    {
+      "name": "面包",
+      "price": 1446.32,
+      "retail_price": 1676,
+      "is_retail": true
+    },
+    {
+      "name": "肉丸",
+      "price": 10094.12,
+      "retail_price": 13390,
+      "is_retail": true
+    },
+    {
+      "name": "轨道助推器",
+      "price": 563140760.06,
       "retail_price": null,
       "is_retail": false
     },
     {
       "name": "水",
-      "price": 4.56,
+      "price": 4.5,
+      "retail_price": null,
+      "is_retail": false
+    },
+    {
+      "name": "咖喱角",
+      "price": 5423.71,
+      "retail_price": 5499,
+      "is_retail": true
+    },
+    {
+      "name": "智能手机",
+      "price": 6553.65,
+      "retail_price": 8501,
+      "is_retail": true
+    },
+    {
+      "name": "糖",
+      "price": 175.46,
+      "retail_price": null,
+      "is_retail": false
+    },
+    {
+      "name": "无人机",
+      "price": 6809.76,
+      "retail_price": 9068,
+      "is_retail": true
+    },
+    {
+      "name": "蔬菜",
+      "price": 50.42,
+      "retail_price": null,
+      "is_retail": false
+    },
+    {
+      "name": "原油",
+      "price": 248.29,
+      "retail_price": null,
+      "is_retail": false
+    },
+    {
+      "name": "鸡蛋",
+      "price": 36.16,
+      "retail_price": 37,
+      "is_retail": true
+    },
+    {
+      "name": "显示器",
+      "price": 5521.63,
+      "retail_price": 7353,
+      "is_retail": true
+    },
+    {
+      "name": "星舰",
+      "price": 3042900926.65,
+      "retail_price": null,
+      "is_retail": false
+    },
+    {
+      "name": "汉堡",
+      "price": 13257.95,
+      "retail_price": 15362,
+      "is_retail": true
+    },
+    {
+      "name": "酱汁",
+      "price": 6436.95,
+      "retail_price": null,
+      "is_retail": false
+    },
+    {
+      "name": "喷气客机",
+      "price": 144914317.3,
+      "retail_price": null,
+      "is_retail": false
+    },
+    {
+      "name": "豪华电动车",
+      "price": 39924.51,
+      "retail_price": 53168,
+      "is_retail": true
+    },
+    {
+      "name": "牛奶",
+      "price": 216.95,
+      "retail_price": 164,
+      "is_retail": true
+    },
+    {
+      "name": "碳纤维复合材",
+      "price": 752.49,
+      "retail_price": null,
+      "is_retail": false
+    },
+    {
+      "name": "钢筋",
+      "price": 8436.97,
       "retail_price": null,
       "is_retail": false
     },
     {
       "name": "牛排",
-      "price": 925.12,
-      "retail_price": 836,
+      "price": 932.58,
+      "retail_price": 873,
       "is_retail": true
+    },
+    {
+      "name": "化合物",
+      "price": 945.06,
+      "retail_price": null,
+      "is_retail": false
+    },
+    {
+      "name": "火箭发动机",
+      "price": 16020558.42,
+      "retail_price": null,
+      "is_retail": false
+    },
+    {
+      "name": "混合果汁",
+      "price": 14011.24,
+      "retail_price": 15377,
+      "is_retail": true
+    },
+    {
+      "name": "种子",
+      "price": 6.84,
+      "retail_price": null,
+      "is_retail": false
+    },
+    {
+      "name": "项链",
+      "price": 25184.08,
+      "retail_price": 20149,
+      "is_retail": true
+    },
+    {
+      "name": "葡萄",
+      "price": 37.7,
+      "retail_price": 103,
+      "is_retail": true
+    },
+    {
+      "name": "香肠",
+      "price": 244.07,
+      "retail_price": 242,
+      "is_retail": true
+    },
+    {
+      "name": "机器人",
+      "price": 114735.52,
+      "retail_price": null,
+      "is_retail": false
+    },
+    {
+      "name": "木板",
+      "price": 83.15,
+      "retail_price": 113,
+      "is_retail": true
+    },
+    {
+      "name": "豪华车内饰",
+      "price": 320013.06,
+      "retail_price": null,
+      "is_retail": false
+    },
+    {
+      "name": "经济燃油车",
+      "price": 19585.61,
+      "retail_price": 26051,
+      "is_retail": true
+    },
+    {
+      "name": "猪",
+      "price": 4766.01,
+      "retail_price": null,
+      "is_retail": false
+    },
+    {
+      "name": "离子推进器",
+      "price": 11129986.1,
+      "retail_price": null,
+      "is_retail": false
+    },
+    {
+      "name": "面团",
+      "price": 8242.67,
+      "retail_price": null,
+      "is_retail": false
+    },
+    {
+      "name": "电池",
+      "price": 8617.05,
+      "retail_price": null,
+      "is_retail": false
+    },
+    {
+      "name": "沙子",
+      "price": 8.04,
+      "retail_price": null,
+      "is_retail": false
+    },
+    {
+      "name": "手袋",
+      "price": 708.1,
+      "retail_price": 738,
+      "is_retail": true
+    },
+    {
+      "name": "千层面",
+      "price": 10847.41,
+      "retail_price": 13311,
+      "is_retail": true
+    },
+    {
+      "name": "经济电动车",
+      "price": 29077.09,
+      "retail_price": 38466,
+      "is_retail": true
+    },
+    {
+      "name": "处理器",
+      "price": 4231.87,
+      "retail_price": null,
+      "is_retail": false
+    },
+    {
+      "name": "咖啡豆",
+      "price": 23.52,
+      "retail_price": null,
+      "is_retail": false
+    },
+    {
+      "name": "姜汁汽水",
+      "price": 597.13,
+      "retail_price": 1510,
+      "is_retail": true
+    },
+    {
+      "name": "车载电脑",
+      "price": 37717.96,
+      "retail_price": null,
+      "is_retail": false
+    },
+    {
+      "name": "谷物",
+      "price": 21.0,
+      "retail_price": null,
+      "is_retail": false
+    },
+    {
+      "name": "飞行计算机",
+      "price": 5424390.19,
+      "retail_price": null,
+      "is_retail": false
+    },
+    {
+      "name": "燃料储罐",
+      "price": 287579.48,
+      "retail_price": null,
+      "is_retail": false
+    },
+    {
+      "name": "豪华飞机",
+      "price": 59935097.36,
+      "retail_price": null,
+      "is_retail": false
+    },
+    {
+      "name": "裙子",
+      "price": 590.58,
+      "retail_price": 560,
+      "is_retail": true
+    },
+    {
+      "name": "牛",
+      "price": 14299.57,
+      "retail_price": null,
+      "is_retail": false
+    },
+    {
+      "name": "苹果汁",
+      "price": 543.88,
+      "retail_price": 476,
+      "is_retail": true
+    },
+    {
+      "name": "固体燃料助推器",
+      "price": 351981.03,
+      "retail_price": null,
+      "is_retail": false
+    },
+    {
+      "name": "汽油",
+      "price": 369.11,
+      "retail_price": 388,
+      "is_retail": true
+    },
+    {
+      "name": "工具",
+      "price": 1230.88,
+      "retail_price": 1639,
+      "is_retail": true
+    },
+    {
+      "name": "内燃机",
+      "price": 91621.06,
+      "retail_price": null,
+      "is_retail": false
+    },
+    {
+      "name": "机翼",
+      "price": 56017.6,
+      "retail_price": null,
+      "is_retail": false
+    },
+    {
+      "name": "电动马达",
+      "price": 34955.31,
+      "retail_price": null,
+      "is_retail": false
+    },
+    {
+      "name": "苹果派",
+      "price": 1958.56,
+      "retail_price": 2144,
+      "is_retail": true
+    },
+    {
+      "name": "建筑预构件",
+      "price": 588106.67,
+      "retail_price": null,
+      "is_retail": false
+    },
+    {
+      "name": "推土机",
+      "price": 913529.43,
+      "retail_price": null,
+      "is_retail": false
+    },
+    {
+      "name": "铁矿石",
+      "price": 63.74,
+      "retail_price": null,
+      "is_retail": false
+    },
+    {
+      "name": "高跟鞋",
+      "price": 572.5,
+      "retail_price": 678,
+      "is_retail": true
+    },
+    {
+      "name": "铝土矿",
+      "price": 119.77,
+      "retail_price": null,
+      "is_retail": false
+    },
+    {
+      "name": "砖块",
+      "price": 21.35,
+      "retail_price": 42,
+      "is_retail": true
+    },
+    {
+      "name": "名牌手表",
+      "price": 13571.32,
+      "retail_price": 17832,
+      "is_retail": true
+    },
+    {
+      "name": "卡车",
+      "price": 31939.61,
+      "retail_price": 42534,
+      "is_retail": true
+    },
+    {
+      "name": "可可",
+      "price": 23.54,
+      "retail_price": null,
+      "is_retail": false
+    },
+    {
+      "name": "皮革",
+      "price": 16501.24,
+      "retail_price": null,
+      "is_retail": false
+    },
+    {
+      "name": "电视机",
+      "price": 8798.46,
+      "retail_price": 11293,
+      "is_retail": true
+    },
+    {
+      "name": "铝材",
+      "price": 343.49,
+      "retail_price": null,
+      "is_retail": false
+    },
+    {
+      "name": "水泥",
+      "price": 75.01,
+      "retail_price": 98,
+      "is_retail": true
+    },
+    {
+      "name": "钢筋混凝土",
+      "price": 44883.65,
+      "retail_price": null,
+      "is_retail": false
+    },
+    {
+      "name": "披萨",
+      "price": 3766.46,
+      "retail_price": 4294,
+      "is_retail": true
+    },
+    {
+      "name": "矿物",
+      "price": 90.89,
+      "retail_price": null,
+      "is_retail": false
+    },
+    {
+      "name": "显示屏",
+      "price": 9318.15,
+      "retail_price": null,
+      "is_retail": false
+    },
+    {
+      "name": "芝士",
+      "price": 647.83,
+      "retail_price": 679,
+      "is_retail": true
+    },
+    {
+      "name": "金矿石",
+      "price": 284.91,
+      "retail_price": null,
+      "is_retail": false
+    },
+    {
+      "name": "石灰石",
+      "price": 10.65,
+      "retail_price": null,
+      "is_retail": false
+    },
+    {
+      "name": "橘子",
+      "price": 31.35,
+      "retail_price": 96,
+      "is_retail": true
+    },
+    {
+      "name": "基本内饰",
+      "price": 46786.62,
+      "retail_price": null,
+      "is_retail": false
+    },
+    {
+      "name": "姿态控制器",
+      "price": 549319.48,
+      "retail_price": null,
+      "is_retail": false
+    },
+    {
+      "name": "棉花",
+      "price": 19.12,
+      "retail_price": null,
+      "is_retail": false
+    },
+    {
+      "name": "塑料",
+      "price": 631.97,
+      "retail_price": null,
+      "is_retail": false
+    },
+    {
+      "name": "面条",
+      "price": 3558.14,
+      "retail_price": null,
+      "is_retail": false
+    },
+    {
+      "name": "机身",
+      "price": 69963.16,
+      "retail_price": null,
+      "is_retail": false
+    },
+    {
+      "name": "巧克力",
+      "price": 1355.93,
+      "retail_price": 1527,
+      "is_retail": true
+    },
+    {
+      "name": "笔记本电脑",
+      "price": 12052.68,
+      "retail_price": 16050,
+      "is_retail": true
+    },
+    {
+      "name": "硅材",
+      "price": 67.86,
+      "retail_price": null,
+      "is_retail": false
+    },
+    {
+      "name": "豪华燃油车",
+      "price": 28323.8,
+      "retail_price": 37719,
+      "is_retail": true
+    },
+    {
+      "name": "喷气发动机",
+      "price": 5256586.04,
+      "retail_price": null,
+      "is_retail": false
+    },
+    {
+      "name": "甘蔗",
+      "price": 23.72,
+      "retail_price": null,
+      "is_retail": false
+    },
+    {
+      "name": "黏土",
+      "price": 6.64,
+      "retail_price": null,
+      "is_retail": false
+    },
+    {
+      "name": "沙拉",
+      "price": 6177.0,
+      "retail_price": 6325,
+      "is_retail": true
+    },
+    {
+      "name": "木材",
+      "price": 51.75,
+      "retail_price": null,
+      "is_retail": false
+    },
+    {
+      "name": "单引擎飞机",
+      "price": 21714014.81,
+      "retail_price": null,
+      "is_retail": false
+    },
+    {
+      "name": "碳纤维",
+      "price": 42.09,
+      "retail_price": null,
+      "is_retail": false
+    },
+    {
+      "name": "棉布",
+      "price": 90.29,
+      "retail_price": null,
+      "is_retail": false
     }
   ],
   "retail_prices": {
-    "水泥": 96,
-    "砖块": 44,
-    "柴油": 438,
-    "汽油": 374,
-    "牛奶": 168,
-    "黄油": 459,
+    "水泥": 98,
+    "砖块": 42,
+    "柴油": 440,
+    "汽油": 388,
+    "牛奶": 164,
+    "黄油": 482,
     "咖啡粉": 260,
-    "牛排": 836,
-    "芝士": 654,
-    "苹果汁": 461,
-    "香肠": 231,
-    "鸡蛋": 38,
-    "工具": 1638,
-    "木板": 110,
-    "窗户": 917,
-    "千层面": 13153,
-    "咖喱角": 5566,
-    "汉堡": 15045,
-    "沙拉": 6105,
-    "混合果汁": 15033,
-    "肉丸": 13379,
-    "面包": 1641,
-    "内衣": 317,
-    "名牌手表": 17795,
-    "手套": 572,
-    "手袋": 710,
-    "裙子": 571,
-    "运动鞋": 520,
-    "项链": 20012,
-    "高跟鞋": 667,
-    "姜汁汽水": 1449,
-    "巧克力": 1489,
-    "披萨": 4195,
-    "橘子": 91,
-    "橙汁": 1060,
-    "苹果": 75,
-    "苹果派": 2122,
-    "葡萄": 106,
-    "平板电脑": 14041,
-    "无人机": 9066,
-    "显示器": 7351,
-    "智能手机": 8617,
-    "电视机": 11232,
-    "笔记本电脑": 16046,
-    "卡车": 42524,
-    "经济燃油车": 26040,
-    "经济电动车": 38421,
-    "豪华燃油车": 37710,
-    "豪华电动车": 53155
+    "牛排": 873,
+    "芝士": 679,
+    "苹果汁": 476,
+    "香肠": 242,
+    "鸡蛋": 37,
+    "工具": 1639,
+    "木板": 113,
+    "窗户": 903,
+    "千层面": 13311,
+    "咖喱角": 5499,
+    "汉堡": 15362,
+    "沙拉": 6325,
+    "混合果汁": 15377,
+    "肉丸": 13390,
+    "面包": 1676,
+    "内衣": 323,
+    "名牌手表": 17832,
+    "手套": 585,
+    "手袋": 738,
+    "裙子": 560,
+    "运动鞋": 527,
+    "项链": 20149,
+    "高跟鞋": 678,
+    "姜汁汽水": 1510,
+    "巧克力": 1527,
+    "披萨": 4294,
+    "橘子": 96,
+    "橙汁": 1079,
+    "苹果": 79,
+    "苹果派": 2144,
+    "葡萄": 103,
+    "平板电脑": 14044,
+    "无人机": 9068,
+    "显示器": 7353,
+    "智能手机": 8501,
+    "电视机": 11293,
+    "笔记本电脑": 16050,
+    "卡车": 42534,
+    "经济燃油车": 26051,
+    "经济电动车": 38466,
+    "豪华燃油车": 37719,
+    "豪华电动车": 53168
   },
   "building_profits": {
     "电力": {
-      "limit": 1684192.0,
-      "opt_level": 99
+      "limit": 1736115.0,
+      "opt_level": 101
     },
     "水": {
-      "limit": 1774286.0,
-      "opt_level": 112
+      "limit": 1545573.0,
+      "opt_level": 104
     },
     "原油": {
-      "limit": 1963592.0,
-      "opt_level": 96
+      "limit": 2023223.0,
+      "opt_level": 97
     },
     "甲烷": {
-      "limit": 1980331.0,
-      "opt_level": 96
+      "limit": 2041175.0,
+      "opt_level": 98
     },
     "种子": {
-      "limit": 933721.0,
-      "opt_level": 148
+      "limit": 1084861.0,
+      "opt_level": 159
     },
     "苹果": {
-      "limit": 988263.0,
-      "opt_level": 152
+      "limit": 1006867.0,
+      "opt_level": 153
     },
     "橘子": {
-      "limit": 923876.0,
-      "opt_level": 147
+      "limit": 1031351.0,
+      "opt_level": 155
     },
     "葡萄": {
-      "limit": 957732.0,
-      "opt_level": 150
+      "limit": 1083404.0,
+      "opt_level": 159
     },
     "谷物": {
-      "limit": 1240769.0,
-      "opt_level": 170
+      "limit": 1427614.0,
+      "opt_level": 183
     },
     "甘蔗": {
-      "limit": 927757.0,
-      "opt_level": 147
+      "limit": 1260084.0,
+      "opt_level": 172
     },
     "棉花": {
-      "limit": 1066912.0,
-      "opt_level": 158
+      "limit": 978301.0,
+      "opt_level": 151
     },
     "咖啡豆": {
-      "limit": 1181848.0,
-      "opt_level": 166
+      "limit": 1287691.0,
+      "opt_level": 174
     },
     "可可": {
-      "limit": 1015400.0,
-      "opt_level": 154
+      "limit": 1068745.0,
+      "opt_level": 158
     },
     "蔬菜": {
-      "limit": 1090266.0,
-      "opt_level": 160
+      "limit": 1224260.0,
+      "opt_level": 169
     },
     "木材": {
-      "limit": 988054.0,
-      "opt_level": 152
+      "limit": 1061047.0,
+      "opt_level": 158
     },
     "沙子": {
-      "limit": 1603624.0,
-      "opt_level": 119
+      "limit": 1390303.0,
+      "opt_level": 110
     },
     "黏土": {
-      "limit": 1445030.0,
-      "opt_level": 113
+      "limit": 1481938.0,
+      "opt_level": 114
     },
     "石灰石": {
-      "limit": 1497688.0,
-      "opt_level": 115
+      "limit": 1534596.0,
+      "opt_level": 116
     },
     "矿物": {
-      "limit": 1589294.0,
-      "opt_level": 118
+      "limit": 1395521.0,
+      "opt_level": 111
     },
     "铝土矿": {
-      "limit": 1395701.0,
-      "opt_level": 111
+      "limit": 1444594.0,
+      "opt_level": 113
     },
     "铁矿石": {
-      "limit": 1418413.0,
-      "opt_level": 112
+      "limit": 1478263.0,
+      "opt_level": 114
     },
     "金矿石": {
-      "limit": 1412757.0,
-      "opt_level": 111
+      "limit": 1463593.0,
+      "opt_level": 113
     },
     "牛": {
-      "limit": 2177379038.0,
-      "opt_level": 6233
+      "limit": 2216899153.0,
+      "opt_level": 6289
     },
     "猪": {
-      "limit": 1179135660.0,
-      "opt_level": 4587
+      "limit": 1200145217.0,
+      "opt_level": 4627
     },
     "鸡蛋": {
       "limit": 0,
@@ -916,20 +916,20 @@
       "opt_level": 0
     },
     "皮革": {
-      "limit": 1872178067.0,
-      "opt_level": 5780
+      "limit": 1902908904.0,
+      "opt_level": 5827
     },
     "动物饲料": {
-      "limit": 349549814.0,
-      "opt_level": 1504
+      "limit": 354797396.0,
+      "opt_level": 1515
     },
     "咖啡粉": {
       "limit": 0,
       "opt_level": 0
     },
     "面粉": {
-      "limit": 20028423.0,
-      "opt_level": 359
+      "limit": 20388418.0,
+      "opt_level": 363
     },
     "牛排": {
       "limit": 0,
@@ -940,8 +940,8 @@
       "opt_level": 0
     },
     "面团": {
-      "limit": 101811302.0,
-      "opt_level": 746
+      "limit": 103654530.0,
+      "opt_level": 753
     },
     "面包": {
       "limit": 0,
@@ -960,8 +960,8 @@
       "opt_level": 0
     },
     "面条": {
-      "limit": 54496771.0,
-      "opt_level": 593
+      "limit": 55507677.0,
+      "opt_level": 599
     },
     "黄油": {
       "limit": 0,
@@ -972,32 +972,32 @@
       "opt_level": 0
     },
     "糖": {
-      "limit": 1841270.0,
-      "opt_level": 108
+      "limit": 1608385.0,
+      "opt_level": 101
     },
     "植物油": {
-      "limit": 10717702.0,
-      "opt_level": 263
+      "limit": 10960897.0,
+      "opt_level": 266
     },
     "橙汁": {
-      "limit": 1785410.0,
-      "opt_level": 134
+      "limit": 2296575.0,
+      "opt_level": 152
     },
     "苹果汁": {
-      "limit": 1161116.0,
-      "opt_level": 108
+      "limit": 1638169.0,
+      "opt_level": 128
     },
     "姜汁汽水": {
-      "limit": 4850093.0,
-      "opt_level": 222
+      "limit": 6197091.0,
+      "opt_level": 251
     },
     "乙醇": {
-      "limit": 1324515.0,
-      "opt_level": 115
+      "limit": 1360993.0,
+      "opt_level": 117
     },
     "酱汁": {
-      "limit": 2837612.0,
-      "opt_level": 102
+      "limit": 2924798.0,
+      "opt_level": 104
     },
     "汉堡": {
       "limit": 0,
@@ -1032,64 +1032,64 @@
       "opt_level": 0
     },
     "火箭燃料": {
-      "limit": 1961734.0,
-      "opt_level": 99
+      "limit": 2018100.0,
+      "opt_level": 100
     },
     "塑料": {
-      "limit": 343044.0,
-      "opt_level": 41
+      "limit": 360336.0,
+      "opt_level": 42
     },
     "碳纤维": {
-      "limit": 1859527.0,
-      "opt_level": 96
+      "limit": 1913636.0,
+      "opt_level": 98
     },
     "硅材": {
-      "limit": 2062584.0,
-      "opt_level": 110
-    },
-    "化合物": {
-      "limit": 17006870.0,
-      "opt_level": 317
-    },
-    "铝材": {
-      "limit": 2706709.0,
-      "opt_level": 126
-    },
-    "钢材": {
-      "limit": 816550647.0,
-      "opt_level": 2203
-    },
-    "玻璃": {
-      "limit": 1897029.0,
+      "limit": 1875970.0,
       "opt_level": 105
     },
+    "化合物": {
+      "limit": 16293191.0,
+      "opt_level": 310
+    },
+    "铝材": {
+      "limit": 2783315.0,
+      "opt_level": 128
+    },
+    "钢材": {
+      "limit": 1184703306.0,
+      "opt_level": 2654
+    },
+    "玻璃": {
+      "limit": 2833983.0,
+      "opt_level": 129
+    },
     "金条": {
-      "limit": 3124962664.0,
-      "opt_level": 4311
+      "limit": 3184157940.0,
+      "opt_level": 4351
     },
     "碳纤维复合材": {
-      "limit": 9122916.0,
-      "opt_level": 232
+      "limit": 9357409.0,
+      "opt_level": 235
     },
     "钢筋混凝土": {
-      "limit": 712281519138.0,
-      "opt_level": 67946
+      "limit": 726417173722.0,
+      "opt_level": 68617
     },
     "砖块": {
-      "limit": 1678195.0,
-      "opt_level": 103
+      "limit": 1732391.0,
+      "opt_level": 105
     },
     "水泥": {
-      "limit": 2465662.0,
-      "opt_level": 125
+      "limit": 2557294.0,
+      "opt_level": 128
     },
     "钢筋": {
-      "limit": 10330461519.0,
-      "opt_level": 7257
+      "limit": 10499477158.0,
+      "opt_level": 7316
     },
     "木板": {
-      "limit": 1833112.0,
-      "opt_level": 96
+      "limit": 1886776.0,
+      "opt_level": 97
     },
     "窗户": {
       "limit": 0,
@@ -1100,24 +1100,24 @@
       "opt_level": 0
     },
     "建筑预构件": {
-      "limit": 7627738734.0,
-      "opt_level": 7378
+      "limit": 7752594393.0,
+      "opt_level": 7439
     },
     "处理器": {
-      "limit": 20649028.0,
-      "opt_level": 365
+      "limit": 29154644.0,
+      "opt_level": 434
     },
     "电子元件": {
-      "limit": 65184781.0,
-      "opt_level": 649
+      "limit": 93587223.0,
+      "opt_level": 778
     },
     "电池": {
-      "limit": 296662129.0,
-      "opt_level": 1386
+      "limit": 418214634.0,
+      "opt_level": 1645
     },
     "显示屏": {
-      "limit": 500462892.0,
-      "opt_level": 1800
+      "limit": 719103219.0,
+      "opt_level": 2158
     },
     "智能手机": {
       "limit": 0,
@@ -1140,24 +1140,24 @@
       "opt_level": 0
     },
     "精密电子元件": {
-      "limit": 21529306459.0,
-      "opt_level": 11812
+      "limit": 23839020682.0,
+      "opt_level": 12430
     },
     "机器人": {
-      "limit": 1678623823.0,
-      "opt_level": 3298
+      "limit": 1706464414.0,
+      "opt_level": 3325
     },
     "车载电脑": {
-      "limit": 3001379144.0,
-      "opt_level": 4410
+      "limit": 3050896418.0,
+      "opt_level": 4446
     },
     "棉布": {
-      "limit": 1995765.0,
-      "opt_level": 108
+      "limit": 1856350.0,
+      "opt_level": 104
     },
     "内衣": {
-      "limit": 45091650.0,
-      "opt_level": 517
+      "limit": 66541328.0,
+      "opt_level": 628
     },
     "手套": {
       "limit": 0,
@@ -1188,40 +1188,40 @@
       "opt_level": 0
     },
     "电动马达": {
-      "limit": 17508266629.0,
-      "opt_level": 8332
+      "limit": 17794166544.0,
+      "opt_level": 8400
     },
     "内燃机": {
-      "limit": 3778598263.0,
-      "opt_level": 3870
+      "limit": 3965956080.0,
+      "opt_level": 3965
     },
     "固体燃料助推器": {
-      "limit": 104724376.0,
-      "opt_level": 643
+      "limit": 123884019.0,
+      "opt_level": 700
     },
     "火箭发动机": {
-      "limit": 345839487782.0,
-      "opt_level": 37035
+      "limit": 351448165092.0,
+      "opt_level": 37334
     },
     "离子推进器": {
-      "limit": 666447656892.0,
-      "opt_level": 51412
+      "limit": 677777757032.0,
+      "opt_level": 51847
     },
     "喷气发动机": {
-      "limit": 264858150568.0,
-      "opt_level": 32410
+      "limit": 269154979985.0,
+      "opt_level": 32672
     },
     "豪华车内饰": {
-      "limit": 372257814392.0,
-      "opt_level": 45188
+      "limit": 378293686721.0,
+      "opt_level": 45553
     },
     "基本内饰": {
-      "limit": 19879346068.0,
-      "opt_level": 10442
+      "limit": 20324330204.0,
+      "opt_level": 10558
     },
     "车身": {
-      "limit": 19508474963.0,
-      "opt_level": 10344
+      "limit": 19825531193.0,
+      "opt_level": 10428
     },
     "经济电动车": {
       "limit": 0,
@@ -1244,88 +1244,88 @@
       "opt_level": 0
     },
     "推土机": {
-      "limit": 541712801140.0,
-      "opt_level": 54512
+      "limit": 550490902487.0,
+      "opt_level": 54952
     },
     "无人机": {
       "limit": 0,
       "opt_level": 0
     },
     "飞行计算机": {
-      "limit": 1994205654907.0,
-      "opt_level": 82309
+      "limit": 2026505874521.0,
+      "opt_level": 82973
     },
     "座舱": {
-      "limit": 2072533360087.0,
-      "opt_level": 83910
+      "limit": 2106101724371.0,
+      "opt_level": 84587
     },
     "姿态控制器": {
-      "limit": 28413420873.0,
-      "opt_level": 9824
+      "limit": 28877183917.0,
+      "opt_level": 9904
     },
     "人造卫星": {
-      "limit": 2260146538114.0,
-      "opt_level": 87626
+      "limit": 2296751965456.0,
+      "opt_level": 88332
     },
     "机身": {
-      "limit": 883589192.0,
-      "opt_level": 1924
+      "limit": 898603493.0,
+      "opt_level": 1941
     },
     "机翼": {
-      "limit": 3215161214.0,
-      "opt_level": 3672
+      "limit": 3268621135.0,
+      "opt_level": 3702
     },
     "燃料储罐": {
-      "limit": 14313737161.0,
-      "opt_level": 7749
+      "limit": 14548704261.0,
+      "opt_level": 7812
     },
     "隔热板": {
-      "limit": 65698466314.0,
-      "opt_level": 16602
+      "limit": 67256468104.0,
+      "opt_level": 16798
     },
     "亚轨道二级": {
-      "limit": 188265251859505.0,
-      "opt_level": 888797
+      "limit": 191311690592805.0,
+      "opt_level": 895959
     },
     "轨道助推器": {
-      "limit": 289943495241270.0,
-      "opt_level": 1102997
+      "limit": 294635166817594.0,
+      "opt_level": 1111885
     },
     "星际飞船": {
-      "limit": 201545885259467.0,
-      "opt_level": 919612
+      "limit": 204807217850654.0,
+      "opt_level": 927022
     },
     "喷气客机": {
-      "limit": 2569710325103.0,
-      "opt_level": 91317
+      "limit": 2611327019151.0,
+      "opt_level": 92054
     },
     "豪华飞机": {
-      "limit": 1758627480515.0,
-      "opt_level": 75544
+      "limit": 1787114776273.0,
+      "opt_level": 76153
     },
     "单引擎飞机": {
-      "limit": 12974339422664.0,
-      "opt_level": 205190
+      "limit": 13184353338744.0,
+      "opt_level": 206844
     },
     "亚轨道火箭": {
-      "limit": 199769973694576.0,
-      "opt_level": 805157
+      "limit": 203002613111617.0,
+      "opt_level": 811645
     },
     "星舰": {
-      "limit": 62174465487307.0,
-      "opt_level": 449181
+      "limit": 63180646617239.0,
+      "opt_level": 452801
     },
     "零售_苹果": {
-      "limit": 4162195.0,
-      "opt_level": 272
+      "limit": 5223594.0,
+      "opt_level": 304
     },
     "零售_橘子": {
-      "limit": 4894734.0,
-      "opt_level": 295
+      "limit": 5948777.0,
+      "opt_level": 325
     },
     "零售_葡萄": {
-      "limit": 5444034.0,
-      "opt_level": 311
+      "limit": 4794142.0,
+      "opt_level": 292
     },
     "零售_牛排": {
       "limit": 0,
@@ -1340,64 +1340,64 @@
       "opt_level": 0
     },
     "零售_咖啡粉": {
-      "limit": 92.0,
-      "opt_level": 1
+      "limit": 0,
+      "opt_level": 0
     },
     "零售_苹果派": {
-      "limit": 26345984.0,
-      "opt_level": 685
+      "limit": 28491096.0,
+      "opt_level": 712
     },
     "零售_橙汁": {
-      "limit": 23279675.0,
-      "opt_level": 644
+      "limit": 24534242.0,
+      "opt_level": 661
     },
     "零售_苹果汁": {
       "limit": 0,
       "opt_level": 0
     },
     "零售_姜汁汽水": {
-      "limit": 15062148.0,
-      "opt_level": 517
+      "limit": 17456614.0,
+      "opt_level": 557
     },
     "零售_披萨": {
-      "limit": 21383248.0,
-      "opt_level": 617
+      "limit": 29331124.0,
+      "opt_level": 723
     },
     "零售_芝士": {
-      "limit": 0,
-      "opt_level": 0
+      "limit": 676650.0,
+      "opt_level": 109
     },
     "零售_巧克力": {
-      "limit": 11506810.0,
-      "opt_level": 452
+      "limit": 17257038.0,
+      "opt_level": 554
     },
     "零售_牛奶": {
       "limit": 0,
       "opt_level": 0
     },
     "零售_面包": {
-      "limit": 12100183.0,
-      "opt_level": 224
+      "limit": 16202129.0,
+      "opt_level": 260
     },
     "零售_黄油": {
       "limit": 0,
       "opt_level": 0
     },
     "零售_汉堡": {
-      "limit": 3008906.0,
-      "opt_level": 111
+      "limit": 4311765.0,
+      "opt_level": 134
     },
     "零售_千层面": {
-      "limit": 31838428.0,
-      "opt_level": 365
+      "limit": 34226911.0,
+      "opt_level": 378
     },
     "零售_肉丸": {
-      "limit": 61239211.0,
-      "opt_level": 506
+      "limit": 58308229.0,
+      "opt_level": 494
     },
     "零售_混合果汁": {
-      "limit": 255078.0,
-      "opt_level": 32
+      "limit": 775710.0,
+      "opt_level": 56
     },
     "零售_沙拉": {
       "limit": 0,
@@ -1408,40 +1408,40 @@
       "opt_level": 0
     },
     "零售_砖块": {
-      "limit": 2191353.0,
-      "opt_level": 176
+      "limit": 1615060.0,
+      "opt_level": 151
     },
     "零售_水泥": {
-      "limit": 537176.0,
-      "opt_level": 86
+      "limit": 684567.0,
+      "opt_level": 98
     },
     "零售_木板": {
-      "limit": 9038611.0,
-      "opt_level": 358
+      "limit": 11046401.0,
+      "opt_level": 396
     },
     "零售_窗户": {
-      "limit": 61803502.0,
-      "opt_level": 937
+      "limit": 50463865.0,
+      "opt_level": 847
     },
     "零售_工具": {
-      "limit": 373550997.0,
-      "opt_level": 2305
+      "limit": 357300176.0,
+      "opt_level": 2254
     },
     "零售_内衣": {
-      "limit": 2201727.0,
-      "opt_level": 131
+      "limit": 2489099.0,
+      "opt_level": 139
     },
     "零售_手套": {
-      "limit": 23478.0,
-      "opt_level": 13
+      "limit": 90049.0,
+      "opt_level": 26
     },
     "零售_裙子": {
       "limit": 0,
       "opt_level": 0
     },
     "零售_高跟鞋": {
-      "limit": 2578309.0,
-      "opt_level": 142
+      "limit": 3142863.0,
+      "opt_level": 157
     },
     "零售_手袋": {
       "limit": 0,
@@ -1452,64 +1452,64 @@
       "opt_level": 0
     },
     "零售_名牌手表": {
-      "limit": 156874456.0,
-      "opt_level": 1114
+      "limit": 151346800.0,
+      "opt_level": 1094
     },
     "零售_项链": {
       "limit": 0,
       "opt_level": 0
     },
     "零售_汽油": {
-      "limit": 0,
-      "opt_level": 0
+      "limit": 232683.0,
+      "opt_level": 40
     },
     "零售_柴油": {
-      "limit": 20063069.0,
-      "opt_level": 377
+      "limit": 19416919.0,
+      "opt_level": 371
     },
     "零售_智能手机": {
-      "limit": 11853854.0,
-      "opt_level": 410
+      "limit": 9680861.0,
+      "opt_level": 370
     },
     "零售_平板电脑": {
-      "limit": 3385363.0,
-      "opt_level": 219
+      "limit": 3174561.0,
+      "opt_level": 212
     },
     "零售_笔记本电脑": {
-      "limit": 13463915.0,
-      "opt_level": 437
+      "limit": 12746009.0,
+      "opt_level": 425
     },
     "零售_显示器": {
-      "limit": 12424877.0,
-      "opt_level": 420
+      "limit": 11760582.0,
+      "opt_level": 408
     },
     "零售_电视机": {
-      "limit": 16464932.0,
-      "opt_level": 483
+      "limit": 16320716.0,
+      "opt_level": 481
     },
     "零售_无人机": {
-      "limit": 5993480.0,
-      "opt_level": 291
+      "limit": 5646463.0,
+      "opt_level": 283
     },
     "零售_经济电动车": {
-      "limit": 94535980.0,
-      "opt_level": 782
+      "limit": 90472939.0,
+      "opt_level": 765
     },
     "零售_豪华电动车": {
-      "limit": 43103196.0,
-      "opt_level": 528
+      "limit": 40867595.0,
+      "opt_level": 514
     },
     "零售_经济燃油车": {
-      "limit": 67954357.0,
-      "opt_level": 663
+      "limit": 64615355.0,
+      "opt_level": 646
     },
     "零售_豪华燃油车": {
-      "limit": 10148286.0,
-      "opt_level": 255
+      "limit": 9544468.0,
+      "opt_level": 248
     },
     "零售_卡车": {
-      "limit": 80374910.0,
-      "opt_level": 721
+      "limit": 76354020.0,
+      "opt_level": 702
     }
   }
 }
