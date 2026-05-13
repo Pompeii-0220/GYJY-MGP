@@ -105,7 +105,7 @@ for name, bp in prices.items():
         dynamic = min(dynamic, cap)
     final_prices[name] = dynamic
 
-# ========== 6. 极限利润 ==========
+# ========== 6. 极限利润（计算用，前端暂不展示） ==========
 def calc_limit(item_name, prices):
     if item_name in prod_data:
         info = prod_data[item_name]
@@ -141,7 +141,7 @@ def calc_limit(item_name, prices):
             return round(limit, 0), n_opt
     return 0, 0
 
-# ========== 7. 输出 ==========
+# ========== 7. 输出 data_output.json ==========
 beijing_tz = timezone(timedelta(hours=8))
 update_time = datetime.now(tz=beijing_tz).strftime("%Y-%m-%d %H:%M:%S")
 
@@ -156,11 +156,13 @@ all_items = set(final_prices.keys()) | {name for r in retail_data.values() for n
 for item in all_items:
     output["items"].append({
         "name": item,
-        "price": final_prices.get(item, 0),
+        "price": final_prices.get(item, 0),          # 动态指导价
+        "base_price": prices.get(item, 0),           # 1倍率基石价（新增）
         "retail_price": retail_price_map.get(item),
         "is_retail": item in retail_price_map
     })
 
+# 极限利润表（保留计算，前端如有需要可调用）
 building_profits = {}
 for p in prod_data:
     limit, opt = calc_limit(p, final_prices)
