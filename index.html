@@ -3,161 +3,116 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>静态均衡指导价</title>
+<title>市场指导价</title>
 <style>
   body { font-family: -apple-system, sans-serif; background: #f5f5f5; margin: 0; padding: 20px; }
-  .container { max-width: 1200px; margin: 0 auto; background: white; padding: 25px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
+  .container { max-width: 1400px; margin: 0 auto; background: white; padding: 25px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
   h1 { text-align: center; color: #2c3e50; }
-  .info { text-align: center; color: #888; font-size: 14px; margin-bottom: 25px; }
-  .info .rate { font-weight: 600; color: #e67e22; font-size: 16px; }
+  .info { text-align: center; color: #888; font-size: 14px; margin-bottom: 20px; }
+  .info .mult { font-weight: 600; color: #e67e22; font-size: 16px; }
   .search-box { text-align: center; margin-bottom: 15px; }
   .search-box input { width: 300px; padding: 8px; border: 1px solid #ccc; border-radius: 5px; font-size: 14px; }
-  .section { margin-bottom: 40px; }
-  .section h2 { background: #2c3e50; color: white; padding: 10px 15px; font-size: 18px; border-radius: 6px; margin: 0 0 12px; }
   table { width: 100%; border-collapse: collapse; font-size: 14px; }
   th, td { padding: 10px 8px; text-align: left; border-bottom: 1px solid #e0e0e0; }
   th { background: #fafafa; font-weight: 600; cursor: pointer; user-select: none; }
   th:hover { background: #f0f0f0; }
   .price { font-weight: 600; color: #e67e22; }
-  .profit { font-weight: 600; color: #27ae60; }
-  .cost { color: #555; }
-  @media (max-width: 600px) { .search-box input { width: 100%; } }
+  .base-price { color: #888; }
+  .limit { color: #e74c3c; font-weight: 600; }
+  .tag { display: inline-block; background: #27ae60; color: white; font-size: 11px; padding: 2px 6px; border-radius: 4px; margin-left: 5px; }
+  .note { text-align: center; margin-top: 15px; color: #888; font-size: 12px; }
 </style>
 </head>
 <body>
 <div class="container">
-  <h1>⚖️ 静态均衡指导价</h1>
+  <h1>🏭 市场指导价</h1>
   <div class="info">
     更新时间：<span id="update-time"></span> &nbsp;|&nbsp;
-    统一小时资本回报率：<span class="rate" id="return-rate"></span>
+    统一市场倍率：<span class="mult" id="unified-mult"></span>
   </div>
-
-  <!-- 产品价格表 -->
-  <div class="section">
-    <h2>📦 产品均衡价</h2>
-    <div class="search-box">
-      <input type="text" id="product-search" placeholder="搜索产品..." oninput="renderProductTable()">
-    </div>
-    <table id="product-table">
-      <thead>
-        <tr>
-          <th data-sort="name">产品名称</th>
-          <th data-sort="price">均衡指导价（元）</th>
-        </tr>
-      </thead>
-      <tbody></tbody>
-    </table>
+  <div class="search-box">
+    <input type="text" id="search" placeholder="搜索商品名称..." oninput="renderTable()">
   </div>
-
-  <!-- 建筑利润表 -->
-  <div class="section">
-    <h2>🏗️ 建筑极限利润</h2>
-    <div class="search-box">
-      <input type="text" id="building-search" placeholder="搜索建筑..." oninput="renderBuildingTable()">
-    </div>
-    <table id="building-table">
-      <thead>
-        <tr>
-          <th data-sort="name">建筑名称</th>
-          <th data-sort="cost">建造成本（元）</th>
-          <th data-sort="profit">极限时利润（元/小时）</th>
-        </tr>
-      </thead>
-      <tbody></tbody>
-    </table>
-  </div>
-
-  <div style="text-align: center; margin-top: 15px; color: #888; font-size: 12px;">
-    * 所有产品价格均基于成本 + 资本回报率（r）迭代计算，建筑利润 = 建造成本 × r
+  <table id="main-table">
+    <thead>
+      <tr>
+        <th data-sort="name">商品</th>
+        <th data-sort="price">指导价</th>
+        <th data-sort="base_price">1倍率指导价</th>
+        <th data-sort="limit">极限利润 (元/h)</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+  <div class="note">
+    * 指导价 = 1倍率基石价 × 统一市场倍率 （零售品不超过当前零售价98%）<br>
+    * 极限利润基于最优等级与管理费公式 (等级²×工资×0.0058) 计算，仅供参考。
   </div>
 </div>
 
 <script>
-let PRODUCTS = [];
-let BUILDINGS = [];
-let productSort = { key: "name", asc: true };
-let buildingSort = { key: "name", asc: true };
+let DATA = null;
+let currentSort = { key: "name", asc: true };
 
 fetch('data_output.json')
   .then(res => res.json())
   .then(json => {
-    document.getElementById('update-time').textContent = json.meta.update_time || '—';
-    document.getElementById('return-rate').textContent = (json.meta.capital_return_rate_per_hour * 100).toFixed(2) + '%';
-
-    // 产品价格
-    PRODUCTS = Object.entries(json.product_prices).map(([name, price]) => ({ name, price }));
-    // 建筑利润
-    BUILDINGS = Object.entries(json.building_profits).map(([name, data]) => ({
-      name,
-      cost: data.建造成本,
-      profit: data.极限时利润
-    }));
-
-    renderProductTable();
-    renderBuildingTable();
+    DATA = json;
+    document.getElementById('update-time').textContent = json.update_time;
+    document.getElementById('unified-mult').textContent = json.unified_multiplier.toFixed(4);
+    renderTable();
   });
 
-function renderProductTable() {
-  const search = document.getElementById('product-search').value.toLowerCase();
-  const items = PRODUCTS.filter(p => p.name.toLowerCase().includes(search));
-  const key = productSort.key;
-  const asc = productSort.asc;
+function renderTable() {
+  if (!DATA) return;
+  const search = document.getElementById('search').value.toLowerCase();
+  const items = DATA.items.filter(it => it.name.toLowerCase().includes(search));
+  const profits = DATA.building_profits || {};
+  const key = currentSort.key;
+  const asc = currentSort.asc;
+
   items.sort((a, b) => {
-    let va = a[key], vb = b[key];
-    if (typeof va === 'string') return asc ? va.localeCompare(vb) : vb.localeCompare(va);
+    let va, vb;
+    if (key === 'name') {
+      va = a.name;
+      vb = b.name;
+      return asc ? va.localeCompare(vb) : vb.localeCompare(va);
+    } else if (key === 'price') {
+      va = a.price || 0;
+      vb = b.price || 0;
+    } else if (key === 'base_price') {
+      va = a.base_price || 0;
+      vb = b.base_price || 0;
+    } else if (key === 'limit') {
+      va = profits[a.name]?.limit || 0;
+      vb = profits[b.name]?.limit || 0;
+    }
     return asc ? va - vb : vb - va;
   });
 
-  const tbody = document.querySelector('#product-table tbody');
-  tbody.innerHTML = items.map(p => `<tr>
-    <td>${p.name}</td>
-    <td class="price">${p.price.toFixed(2)} 元</td>
-  </tr>`).join('');
+  const tbody = document.querySelector('#main-table tbody');
+  tbody.innerHTML = items.map(it => {
+    const profit = profits[it.name] || {};
+    const limit = profit.limit ? profit.limit.toLocaleString() : '—';
+    return `<tr>
+      <td>${it.name}${it.is_retail ? '<span class="tag">零售</span>' : ''}</td>
+      <td class="price">${it.price.toFixed(2)} 元</td>
+      <td class="base-price">${it.base_price.toFixed(2)} 元</td>
+      <td class="limit">${limit}</td>
+    </tr>`;
+  }).join('');
 }
 
-function renderBuildingTable() {
-  const search = document.getElementById('building-search').value.toLowerCase();
-  const items = BUILDINGS.filter(b => b.name.toLowerCase().includes(search));
-  const key = buildingSort.key;
-  const asc = buildingSort.asc;
-  items.sort((a, b) => {
-    let va = a[key], vb = b[key];
-    if (typeof va === 'string') return asc ? va.localeCompare(vb) : vb.localeCompare(va);
-    return asc ? va - vb : vb - va;
-  });
-
-  const tbody = document.querySelector('#building-table tbody');
-  tbody.innerHTML = items.map(b => `<tr>
-    <td>${b.name}</td>
-    <td class="cost">${b.cost.toLocaleString()} 元</td>
-    <td class="profit">${b.profit.toLocaleString()} 元/小时</td>
-  </tr>`).join('');
-}
-
-// 排序事件
-document.querySelectorAll('#product-table th[data-sort]').forEach(th => {
+document.querySelectorAll('#main-table th[data-sort]').forEach(th => {
   th.addEventListener('click', () => {
     const key = th.dataset.sort;
-    if (productSort.key === key) {
-      productSort.asc = !productSort.asc;
+    if (currentSort.key === key) {
+      currentSort.asc = !currentSort.asc;
     } else {
-      productSort.key = key;
-      productSort.asc = true;
+      currentSort.key = key;
+      currentSort.asc = true;
     }
-    renderProductTable();
-  });
-});
-
-document.querySelectorAll('#building-table th[data-sort]').forEach(th => {
-  th.addEventListener('click', () => {
-    const key = th.dataset.sort;
-    if (buildingSort.key === key) {
-      buildingSort.asc = !buildingSort.asc;
-    } else {
-      buildingSort.key = key;
-      buildingSort.asc = true;
-    }
-    renderBuildingTable();
+    renderTable();
   });
 });
 </script>
