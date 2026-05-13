@@ -119,10 +119,13 @@ def main():
 
     prices, profits = calculate_equilibrium(buildings, r=CAPITAL_RETURN_RATE)
 
+    from datetime import datetime
+
     output = {
         "meta": {
             "description": "基于等资本回报率的静态均衡指导价",
-            "capital_return_rate_per_hour": CAPITAL_RETURN_RATE
+            "capital_return_rate_per_hour": CAPITAL_RETURN_RATE,
+            "update_time": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         },
         "product_prices": prices,
         "building_profits": profits
