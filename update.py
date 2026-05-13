@@ -38,7 +38,6 @@ retail_base_price_map = {item["name"]: item["basePrice"] for item in retail_rows
 
 # ========== 3. 辅助函数 ==========
 def calc_material_cost(product_name, prices):
-    """计算1个单位产品的原料成本"""
     if product_name not in prod_data:
         return 0.0
     info = prod_data[product_name]
@@ -51,7 +50,6 @@ def calc_material_cost(product_name, prices):
     return cost
 
 def calc_limit_profit(item_name, prices, is_retail=False):
-    """计算生产建筑或零售建筑的1级时利润、最优等级、极限利润"""
     if is_retail:
         for shop, data in retail_data.items():
             if item_name in data["items"]:
@@ -85,63 +83,42 @@ def calc_limit_profit(item_name, prices, is_retail=False):
 
 # ========== 4. 初始化所有价格 ==========
 prices = dict(BASE_GUIDE_PRICES)
-
-# 对缺失产品先用零售基础价填充（如果有），否则用成本加成估计
 for p in prod_data:
     if p not in prices:
         if p in retail_base_price_map:
             prices[p] = retail_base_price_map[p]
         else:
-            # 成本加成临时估计
             labor = prod_data[p]["wage"] / prod_data[p]["output"]
             prices[p] = round(labor * 2.0, 2)
 
-# ========== 5. 迭代均衡基石价 ==========
-print("开始迭代均衡基石价...")
+# ========== 5. 迭代均衡基石价（只调有零售价的终端品） ==========
+print("开始均衡基石价...")
 for iteration in range(50):
     changed = False
     for pname in prod_data:
-        if pname in BASE_GUIDE_PRICES:  # 旧产品不动
-            continue
-        # 只有同时有生产和零售的产品才需要平衡
-        is_retail = pname in retail_base_price_map
-        if not is_retail:
-            continue  # 纯中间品不直接零售，不需要平衡销售端
-
-        # 读取当前价格
+        if pname in BASE_GUIDE_PRICES or pname not in retail_base_price_map:
+            continue  # 旧产品或有零售价的终端品才调整
         current_price = prices[pname]
-
-        # 计算当前状态下生产和零售的极限利润差
-        prod_limit, _, _ = calc_limit_profit(pname, prices, is_retail=False)
-        retail_limit, _, _ = calc_limit_profit(pname, prices, is_retail=True)
-
-        if prod_limit == 0 and retail_limit == 0:
-            continue  # 两者均无利润，调整无效，跳过
-
-        # 二分法调整基石价，使得生产与零售极限利润差接近0
-        lo = max(calc_material_cost(pname, prices) * 1.01, 0.01)  # 不低于原料成本
-        hi = retail_base_price_map.get(pname, current_price * 2)  # 不高于零售基础价
+        lo = max(calc_material_cost(pname, prices) * 1.01, 0.01)
+        hi = retail_base_price_map.get(pname, current_price * 2)
         if hi <= lo:
             continue
 
+        # 二分法找最佳点
         best_price = current_price
-        best_diff = abs(prod_limit - retail_limit)
-
+        best_diff = float('inf')
         for _ in range(20):
             mid = (lo + hi) / 2
-            temp_prices = prices.copy()
-            temp_prices[pname] = mid
-            p_lim, _, _ = calc_limit_profit(pname, temp_prices, is_retail=False)
-            r_lim, _, _ = calc_limit_profit(pname, temp_prices, is_retail=True)
-
+            temp = prices.copy()
+            temp[pname] = mid
+            p_lim, _, _ = calc_limit_profit(pname, temp, False)
+            r_lim, _, _ = calc_limit_profit(pname, temp, True)
             if p_lim == 0 and r_lim == 0:
                 break
             diff = abs(p_lim - r_lim)
             if diff < best_diff:
                 best_diff = diff
                 best_price = mid
-
-            # 如果生产利润 > 零售利润，说明价格偏高（生产赚得多），应降价
             if p_lim > r_lim:
                 hi = mid
             else:
@@ -151,14 +128,22 @@ for iteration in range(50):
         if new_price != current_price:
             prices[pname] = new_price
             changed = True
-
     if not changed:
-        print(f"  迭代第{iteration+1}次收敛，停止")
+        print(f"  第{iteration+1}次收敛")
         break
 
-# ========== 6. 统一市场倍率 ==========
-total_w = 0.0
-sum_m = 0.0
+# ========== 6. 价格保底（防止原料比产品贵） ==========
+print("执行价格保底...")
+for _ in range(3):  # 重复几次，因为上下游互相影响
+    for pname in prod_data:
+        if pname == "电力":
+            continue
+        min_price = calc_material_cost(pname, prices) * 1.02  # 原料成本 + 2%
+        if prices.get(pname, 0) < min_price:
+            prices[pname] = round(min_price, 2)
+
+# ========== 7. 统一市场倍率 ==========
+total_w = sum_m = 0.0
 for item in retail_rows:
     name = item["name"]
     if name not in prices:
@@ -171,10 +156,9 @@ for item in retail_rows:
     if speed > 0:
         sum_m += item["multiplier"] * speed
         total_w += speed
-
 unified_mult = sum_m / total_w if total_w > 0 else 1.0
 
-# ========== 7. 动态指导价（加零售安全帽） ==========
+# ========== 8. 动态指导价 ==========
 final_prices = {}
 for name, bp in prices.items():
     dynamic = round(bp * unified_mult, 2)
@@ -183,7 +167,7 @@ for name, bp in prices.items():
         dynamic = min(dynamic, cap)
     final_prices[name] = dynamic
 
-# ========== 8. 输出 data_output.json ==========
+# ========== 9. 输出 ==========
 beijing_tz = timezone(timedelta(hours=8))
 update_time = datetime.now(tz=beijing_tz).strftime("%Y-%m-%d %H:%M:%S")
 
@@ -206,17 +190,16 @@ for item in all_items:
 
 building_profits = {}
 for p in prod_data:
-    limit, opt, _ = calc_limit_profit(p, prices, is_retail=False)
+    limit, opt, _ = calc_limit_profit(p, prices, False)
     building_profits[p] = {"limit": limit, "opt_level": opt}
 for shop, data in retail_data.items():
     for rname in data["items"]:
         if rname in retail_price_map:
-            limit, opt, _ = calc_limit_profit(rname, prices, is_retail=True)
+            limit, opt, _ = calc_limit_profit(rname, prices, True)
             building_profits[f"零售_{rname}"] = {"limit": limit, "opt_level": opt}
-
 output["building_profits"] = building_profits
 
 with open("data_output.json", "w", encoding="utf-8") as f:
     json.dump(output, f, ensure_ascii=False, indent=2)
 
-print(f"✅ 均衡基石价生成完毕，统一倍率 {unified_mult:.4f}")
+print(f"✅ 统一倍率 {unified_mult:.4f}，指导价已更新（含价格保底）")
