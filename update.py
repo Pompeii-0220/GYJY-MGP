@@ -1,146 +1,183 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+静态均衡指导价计算引擎
+核心规则：任何建筑每小时利润 = 其建造成本 × 统一资本回报率 r
+通过迭代求解所有产品的均衡内部结算价（包括建材自身价格自洽）
+"""
+
 import json
-import requests
-from datetime import datetime, timezone, timedelta
+import os
 
-with open("game_data.json", "r", encoding="utf-8") as f:
-    gd = json.load(f)
+# ==================== 可调参数 ====================
+CAPITAL_RETURN_RATE = 0.0001  # 统一小时资本回报率 (0.01%/h)
+MAX_ITER = 500                # 最大迭代次数
+TOLERANCE = 1e-8              # 价格收敛阈值
+INITIAL_PRICE = 1.0           # 迭代前所有产品的初始猜测价
 
-prod_data = gd["production"]
-retail_data = gd["retail"]
-mgmt_rate = gd["management_rate"]
+# ==================== 核心算法 ====================
+def calculate_equilibrium(buildings, r=CAPITAL_RETURN_RATE):
+    """
+    输入: buildings 列表，每个元素为 dict，格式:
+        {
+            "name": "农场",
+            "wage": 7280,
+            "construction": {"钢筋混凝土": 48, ...},  # 可选，缺失或为空则建造成本为0
+            "products": [
+                {
+                    "name": "苹果",
+                    "output": 2022,
+                    "inputs": {"水": 3, "种子": 1}
+                },
+                ...
+            ]
+        }
+    输出: (均衡价格字典, 各建筑极限利润字典)
+    """
+    # 1. 收集所有产品名，初始化价格
+    all_products = set()
+    for b in buildings:
+        for p in b["products"]:
+            all_products.add(p["name"])
+    prices = {p: INITIAL_PRICE for p in all_products}
 
-url = "http://gyjy.xmonecode.com/api/public/retail-prices"
-resp = requests.get(url, timeout=15)
-resp.raise_for_status()
-api_json = resp.json()
-retail_rows = api_json.get("rows", [])
-retail_price_map = {item["name"]: item["retailPrice"] for item in retail_rows}
-retail_base_price_map = {item["name"]: item["basePrice"] for item in retail_rows}
+    # 2. 预处理每个建筑的产品数据（避免循环中重复解析）
+    building_info = []
+    for b in buildings:
+        wage = b["wage"]
+        const = b.get("construction", {})
+        products = []
+        for p in b["products"]:
+            inputs = p.get("inputs", {})
+            products.append({
+                "name": p["name"],
+                "output": p["output"],
+                "inputs": inputs
+            })
+        building_info.append({
+            "name": b["name"],
+            "wage": wage,
+            "const": const,
+            "products": products
+        })
 
-# ========== 1. 计算基石价 ==========
-PR = 0.15
-prices = {}
-prices["电力"] = round(prod_data["电力"]["wage"] / prod_data["电力"]["output"] * (1 + PR), 2)
+    # 3. 迭代求解
+    for iteration in range(MAX_ITER):
+        new_prices = prices.copy()
 
-remaining = set(prod_data.keys()) - {"电力"}
-while remaining:
-    solved = set()
-    for p in remaining:
-        info = prod_data[p]
-        recipe = info["recipe"]
-        batch = info.get("batch", 1)
-        mat = 0.0
-        ok = True
-        for ing, amt in recipe.items():
-            if ing not in prices:
-                ok = False; break
-            mat += (amt / batch) * prices[ing]
-        if not ok: continue
-        labor = info["wage"] / info["output"]
-        price = round((mat + labor) * (1 + PR), 2)
-        prices[p] = price
-        solved.add(p)
-    if not solved:
-        for p in remaining:
-            if p not in prices:
-                prices[p] = round(prod_data[p]["wage"] / prod_data[p]["output"] * 2, 2)
-        break
-    remaining -= solved
+        # 3.1 根据当前价格计算每个建筑的建造成本 C
+        for bld in building_info:
+            C = 0.0
+            for mat, qty in bld["const"].items():
+                if mat in prices:
+                    C += qty * prices[mat]
+                else:
+                    # 如果建材名未出现在产品列表中（不应该），忽略
+                    pass
+            bld["C"] = C
 
-# ========== 2. 价格保底（仅非零售品） ==========
-for _ in range(3):
-    for p in prod_data:
-        if p == "电力" or p in retail_base_price_map:  # 零售品跳过保底
-            continue
-        info = prod_data[p]
-        mat = 0.0
-        for ing, amt in info["recipe"].items():
-            mat += (amt / info.get("batch", 1)) * prices.get(ing, 0)
-        if prices[p] < mat * 1.05:
-            prices[p] = round(mat * 1.05, 2)
+        # 3.2 遍历每个建筑，计算其产品的“新价格”
+        for bld in building_info:
+            wage = bld["wage"]
+            C = bld.get("C", 0.0)
+            fixed_cost = wage + C * r   # 该建筑每小时应得的总收入（工资+资本回报）
 
-# ========== 3. 零售品强制锁定API基础价 ==========
-for p in retail_base_price_map:
-    prices[p] = retail_base_price_map[p]
+            # 计算该建筑的总产值和总原料成本（用上轮价格），为分摊做准备
+            total_revenue = 0.0
+            total_material_cost = 0.0
+            prod_data = []
 
-# ========== 4. 统一市场倍率 ==========
-tw = sw = 0.0
-for r in retail_rows:
-    n = r["name"]
-    if n not in prices: continue
-    sp = 0
-    for d in retail_data.values():
-        if n in d["items"]:
-            sp = d["items"][n]; break
-    if sp:
-        sw += r["multiplier"] * sp; tw += sp
-um = sw / tw if tw else 1.0
+            for p in bld["products"]:
+                output = p["output"]
+                # 单位原料成本
+                unit_mat = 0.0
+                for mat, qty in p["inputs"].items():
+                    unit_mat += qty * prices[mat]
+                mat_total = output * unit_mat
+                revenue = output * prices[p["name"]]   # 用旧价格算产值
+                total_revenue += revenue
+                total_material_cost += mat_total
+                prod_data.append({
+                    "name": p["name"],
+                    "output": output,
+                    "unit_mat": unit_mat,
+                    "revenue": revenue
+                })
 
-# ========== 5. 动态指导价（含安全帽0.98） ==========
-final = {}
-for n, bp in prices.items():
-    d = round(bp * um, 2)
-    if n in retail_price_map:
-        d = min(d, round(retail_price_map[n] * 0.98, 2))
-    final[n] = d
+            # 分摊固定成本到各个产品（按产值比例）
+            if total_revenue > 0:
+                for pd in prod_data:
+                    share = pd["revenue"] / total_revenue
+                    unit_fixed = share * fixed_cost / pd["output"]
+                    new_price = pd["unit_mat"] + unit_fixed
+                    new_prices[pd["name"]] = new_price
+            else:
+                # 如果总产值为0（极特殊情况，所有产品价格均为0），跳过
+                pass
 
-# ========== 6. 极限利润计算 ==========
-def lim(it, prc, retail=False):
-    if retail:
-        for d in retail_data.values():
-            if it in d["items"]:
-                wage = d["wage"]
-                rp = retail_price_map.get(it, 0)
-                bp = prc.get(it, 0)
-                sl = d["items"][it]
-                gr = sl*(rp-bp) - wage
-                if gr <= 0: return 0,0,0
-                n = int(gr/(2*wage*mgmt_rate)-0.5)
-                if n < 1: n = 1
-                return round(gr*n - wage*n*n*mgmt_rate, 0), n, round(gr,2)
-        return 0,0,0
+        # 3.3 检查收敛：新旧价格的总平方差
+        diff = 0.0
+        for p in all_products:
+            diff += (new_prices[p] - prices[p]) ** 2
+        diff = diff ** 0.5
+        prices = new_prices
+
+        if diff < TOLERANCE:
+            print(f"迭代收敛于第 {iteration+1} 轮，价格差异 {diff:.12f}")
+            break
     else:
-        if it not in prod_data: return 0,0,0
-        info = prod_data[it]
-        wage = info["wage"]
-        out = info["output"]
-        pr = prc.get(it, 0)
-        mat = 0.0
-        for ing, amt in info["recipe"].items():
-            mat += (amt / info.get("batch", 1)) * prc.get(ing, 0)
-        gr = out*(pr - mat) - wage
-        if gr <= 0: return 0,0,0
-        n = int(gr/(2*wage*mgmt_rate)-0.5)
-        if n < 1: n = 1
-        return round(gr*n - wage*n*n*mgmt_rate, 0), n, round(gr,2)
+        print(f"达到最大迭代次数 {MAX_ITER}，最终差异 {diff:.12f}")
 
-# ========== 7. 输出 ==========
-beijing = timezone(timedelta(hours=8))
-out = {
-    "update_time": datetime.now(tz=beijing).strftime("%Y-%m-%d %H:%M:%S"),
-    "unified_multiplier": round(um, 4),
-    "items": [],
-    "retail_prices": retail_price_map
-}
-for item in set(final.keys()) | {n for d in retail_data.values() for n in d["items"]}:
-    out["items"].append({
-        "name": item,
-        "price": final.get(item, 0),
-        "base_price": prices.get(item, 0),
-        "retail_price": retail_price_map.get(item),
-        "is_retail": item in retail_price_map
-    })
-bp = {}
-for p in prod_data:
-    l, o, _ = lim(p, prices, False)
-    bp[p] = {"limit": l, "opt_level": o}
-for d in retail_data.values():
-    for rn in d["items"]:
-        if rn in retail_price_map:
-            l, o, _ = lim(rn, prices, True)
-            bp[f"零售_{rn}"] = {"limit": l, "opt_level": o}
-out["building_profits"] = bp
+    # 4. 汇总各建筑极限利润
+    profit_summary = {}
+    for bld in building_info:
+        C = bld.get("C", 0.0)
+        profit_per_hour = C * r
+        profit_summary[bld["name"]] = {
+            "建造成本": round(C, 2),
+            "极限时利润": round(profit_per_hour, 2)
+        }
 
-with open("data_output.json", "w") as f:
-    json.dump(out, f, ensure_ascii=False, indent=2)
-print(f"统一倍率 {um:.4f}，指导价已生成")
+    # 价格保留两位小数便于展示
+    final_prices = {k: round(v, 2) for k, v in prices.items()}
+
+    return final_prices, profit_summary
+
+
+# ==================== 主程序 ====================
+def main():
+    # 读取建筑数据
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    data_path = os.path.join(script_dir, "game_data.json")
+    with open(data_path, "r", encoding="utf-8") as f:
+        buildings = json.load(f)
+
+    # 计算均衡价格
+    prices, profits = calculate_equilibrium(buildings, r=CAPITAL_RETURN_RATE)
+
+    # 组装输出结果
+    output = {
+        "meta": {
+            "description": "基于等资本回报率的静态均衡指导价",
+            "capital_return_rate_per_hour": CAPITAL_RETURN_RATE,
+            "note": "所有建筑每小时利润 = 建造成本 × 资本回报率"
+        },
+        "product_prices": prices,
+        "building_profits": profits
+    }
+
+    # 写出 JSON
+    output_path = os.path.join(script_dir, "data_output.json")
+    with open(output_path, "w", encoding="utf-8") as f:
+        json.dump(output, f, indent=2, ensure_ascii=False)
+
+    print("计算完成，结果已写入 data_output.json")
+    # 打印几个关键产品价格供快速查看
+    print("\n部分均衡价格：")
+    for key in ["电力", "水", "钢筋混凝土", "苹果", "经济电动车"]:
+        if key in prices:
+            print(f"  {key}: {prices[key]}")
+
+
+if __name__ == "__main__":
+    main()
