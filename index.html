@@ -46,7 +46,8 @@
   </table>
   <div class="note">
     * 指导价 = 1倍率基石价 × 统一市场倍率 （零售品不超过当前零售价98%）<br>
-    * 极限利润基于最优等级与管理费公式 (等级²×工资×0.0058) 计算，仅供参考。
+    * 极限利润基于最优等级与管理费公式计算，仅供参考。<br>
+    * "零售"标签表示该产品可直接出售给系统商店，指导价为生产端出售给零售端的建议批发价。
   </div>
 </div>
 
@@ -84,15 +85,18 @@ function renderTable() {
       va = a.base_price || 0;
       vb = b.base_price || 0;
     } else if (key === 'limit') {
-      va = profits[a.name]?.limit || 0;
-      vb = profits[b.name]?.limit || 0;
+      const profitKeyA = a.is_retail ? '零售_' + a.name : a.name;
+      const profitKeyB = b.is_retail ? '零售_' + b.name : b.name;
+      va = profits[profitKeyA]?.limit || 0;
+      vb = profits[profitKeyB]?.limit || 0;
     }
     return asc ? va - vb : vb - va;
   });
 
   const tbody = document.querySelector('#main-table tbody');
   tbody.innerHTML = items.map(it => {
-    const profit = profits[it.name] || {};
+    const profitKey = it.is_retail ? '零售_' + it.name : it.name;
+    const profit = profits[profitKey] || {};
     const limit = profit.limit ? profit.limit.toLocaleString() : '—';
     return `<tr>
       <td>${it.name}${it.is_retail ? '<span class="tag">零售</span>' : ''}</td>
