@@ -2,11 +2,10 @@ import json
 import requests
 from datetime import datetime, timezone, timedelta
 
-# ========== 1. 加载新格式数据 ==========
+# ========== 1. 加载静态数据库 ==========
 with open("game_data.json", "r", encoding="utf-8") as f:
     buildings = json.load(f)
 
-# 转换为产品维度的字典
 prod_data = {}
 for b in buildings:
     bname = b["name"]
@@ -20,7 +19,7 @@ for b in buildings:
             "inputs": prod["inputs"]
         }
 
-# ========== 2. 零售数据（你提供的表格） ==========
+# ========== 2. 零售数据 ==========
 retail_data = {
     "生鲜商店": {"wage": 9660, "items": {
         "苹果": 902.6, "橘子": 714.2, "葡萄": 649.9, "牛排": 246.9,
