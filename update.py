@@ -172,8 +172,8 @@ update_time = datetime.now(tz=beijing).strftime("%Y-%m-%d %H:%M:%S")
 output = {
     "update_time": update_time,
     "unified_multiplier": round(unified_mult, 4),
-    "optimization_success": res.success,
-    "final_cv": objective(res.x),
+    "optimization_success": bool(res.success),
+    "final_cv": float(objective(res.x)),
     "items": [],
     "retail_prices": retail_price_map
 }
