@@ -6,19 +6,20 @@
 <title>市场指导价</title>
 <style>
   body { font-family: -apple-system, sans-serif; background: #f5f5f5; margin: 0; padding: 20px; }
-  .container { max-width: 1500px; margin: 0 auto; background: white; padding: 25px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
+  .container { max-width: 1700px; margin: 0 auto; background: white; padding: 25px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
   h1 { text-align: center; color: #2c3e50; }
   .info { text-align: center; color: #888; font-size: 14px; margin-bottom: 20px; }
   .info .mult { font-weight: 600; color: #e67e22; font-size: 16px; }
   .search-box { text-align: center; margin-bottom: 15px; }
   .search-box input { width: 300px; padding: 8px; border: 1px solid #ccc; border-radius: 5px; font-size: 14px; }
-  table { width: 100%; border-collapse: collapse; font-size: 13px; }
-  th, td { padding: 10px 8px; text-align: left; border-bottom: 1px solid #e0e0e0; }
+  table { width: 100%; border-collapse: collapse; font-size: 12px; }
+  th, td { padding: 8px 6px; text-align: left; border-bottom: 1px solid #e0e0e0; }
   th { background: #fafafa; font-weight: 600; cursor: pointer; user-select: none; }
   th:hover { background: #f0f0f0; }
   .price { font-weight: 600; color: #e67e22; }
   .base-price { color: #888; }
-  .limit { color: #e74c3c; font-weight: 600; }
+  .prod-limit { color: #e74c3c; font-weight: 600; }
+  .retail-limit { color: #27ae60; font-weight: 600; }
   .opt-level { color: #3498db; font-weight: 600; }
   .tag { display: inline-block; background: #27ae60; color: white; font-size: 11px; padding: 2px 6px; border-radius: 4px; margin-left: 5px; }
   .note { text-align: center; margin-top: 15px; color: #888; font-size: 12px; }
@@ -40,7 +41,8 @@
         <th data-sort="name">商品</th>
         <th data-sort="price">指导价</th>
         <th data-sort="base_price">1倍率指导价</th>
-        <th data-sort="limit">极限利润 (元/h)</th>
+        <th data-sort="prod_limit">生产极限利润</th>
+        <th data-sort="retail_limit">零售极限利润</th>
         <th data-sort="opt_level">最高等级</th>
       </tr>
     </thead>
@@ -48,8 +50,8 @@
   </table>
   <div class="note">
     * 指导价 = 1倍率基石价 × 统一市场倍率 （零售品不超过当前零售价98%）<br>
-    * 极限利润与最高等级基于最优等级与管理费公式计算，仅供参考。<br>
-    * "零售"标签表示该产品可直接出售给系统商店，指导价为生产端出售给零售端的建议批发价。
+    * 生产极限利润和零售极限利润分别对应生产建筑和零售建筑，仅零售品有零售极限利润。<br>
+    * 最高等级基于生产端最优等级（若利润为0则显示零售端最优等级）。
   </div>
 </div>
 
@@ -83,49 +85,70 @@ function renderTable() {
       va = a.price || 0; vb = b.price || 0;
     } else if (key === 'base_price') {
       va = a.base_price || 0; vb = b.base_price || 0;
-    } else if (key === 'limit') {
-      va = getProfitInfo(a).limit;
-      vb = getProfitInfo(b).limit;
+    } else if (key === 'prod_limit') {
+      va = getProductionProfit(a).limit;
+      vb = getProductionProfit(b).limit;
+    } else if (key === 'retail_limit') {
+      va = getRetailProfit(a).limit;
+      vb = getRetailProfit(b).limit;
     } else if (key === 'opt_level') {
-      va = getProfitInfo(a).opt_level;
-      vb = getProfitInfo(b).opt_level;
+      va = getDisplayInfo(a).opt_level;
+      vb = getDisplayInfo(b).opt_level;
     }
     return asc ? va - vb : vb - va;
   });
 
   const tbody = document.querySelector('#main-table tbody');
   tbody.innerHTML = items.map(it => {
-    const info = getProfitInfo(it);
-    const limit = info.limit ? info.limit.toLocaleString() : '—';
-    const optLevel = info.opt_level ? info.opt_level.toLocaleString() : '—';
+    const prodInfo = getProductionProfit(it);
+    const retailInfo = getRetailProfit(it);
+    const displayInfo = getDisplayInfo(it);
+
+    const prodLimit = prodInfo.limit ? prodInfo.limit.toLocaleString() : '—';
+    const retailLimit = retailInfo.limit ? retailInfo.limit.toLocaleString() : (it.is_retail ? '—' : '—');
+    const optLevel = displayInfo.opt_level ? displayInfo.opt_level.toLocaleString() : '—';
+
     return `<tr>
       <td>${it.name}${it.is_retail ? '<span class="tag">零售</span>' : ''}</td>
       <td class="price">${it.price.toFixed(2)} 元</td>
       <td class="base-price">${it.base_price.toFixed(2)} 元</td>
-      <td class="limit">${limit}</td>
+      <td class="prod-limit">${prodLimit}</td>
+      <td class="retail-limit">${retailLimit}</td>
       <td class="opt-level">${optLevel}</td>
     </tr>`;
   }).join('');
 }
 
-function getProfitInfo(item) {
+function getProductionProfit(item) {
+  const profits = DATA.building_profits || {};
+  if (profits[item.name] && profits[item.name].limit > 0) {
+    return profits[item.name];
+  }
+  return {};
+}
+
+function getRetailProfit(item) {
   const profits = DATA.building_profits || {};
   if (item.is_retail) {
-    // 零售品优先显示零售端利润
     const retailKey = '零售_' + item.name;
     if (profits[retailKey] && profits[retailKey].limit > 0) {
       return profits[retailKey];
     }
-    // 零售端无利润时看生产端
-    if (profits[item.name] && profits[item.name].limit > 0) {
-      return profits[item.name];
-    }
-    // 都没有则返回空
-    return {};
-  } else {
-    // 中间品直接显示生产端利润
-    return profits[item.name] || {};
   }
+  return {};
+}
+
+function getDisplayInfo(item) {
+  // 最高等级优先显示生产端，如果生产端为0则显示零售端
+  const prodInfo = getProductionProfit(item);
+  if (prodInfo.opt_level > 0) {
+    return prodInfo;
+  }
+  const retailInfo = getRetailProfit(item);
+  if (retailInfo.opt_level > 0) {
+    return retailInfo;
+  }
+  return {};
 }
 
 document.querySelectorAll('#main-table th[data-sort]').forEach(th => {
