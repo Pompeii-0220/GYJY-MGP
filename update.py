@@ -65,10 +65,10 @@ def limit_profit(product_name, prices, is_retail=False):
         if product_name not in prod_data: return 0
         info = prod_data[product_name]
         wage = info["wage"]
-        output = info["output"]
+        outph = info["output"]
         price = prices.get(product_name, 0)
         mat = material_cost(product_name, prices)
-        gross = output * (price - mat) - wage
+        gross = outph * (price - mat) - wage
         if gross <= 0: return 0
         n = int(gross / (2 * wage * mgmt_rate) - 0.5)
         if n < 1: n = 1
@@ -170,7 +170,7 @@ for name, bp in prices.items():
 beijing_tz = timezone(timedelta(hours=8))
 update_time = datetime.now(tz=beijing_tz).strftime("%Y-%m-%d %H:%M:%S")
 
-output = {
+output_data = {
     "update_time": update_time,
     "unified_multiplier": round(unified_mult, 4),
     "items": [],
@@ -179,7 +179,7 @@ output = {
 
 all_items = set(final_prices.keys()) | {name for r in retail_data.values() for name in r["items"]}
 for item in all_items:
-    output["items"].append({
+    output_data["items"].append({
         "name": item,
         "price": final_prices.get(item, 0),
         "base_price": prices.get(item, 0),
@@ -192,9 +192,11 @@ for p in prod_data:
     lp = limit_profit(p, prices, False)
     bp_dict[p] = {"limit": round(lp, 0), "opt_level": 0}
     info = prod_data[p]
-    wage = info["wage"]; output = info["output"]
-    price = prices.get(p, 0); mat = material_cost(p, prices)
-    gross = output * (price - mat) - wage
+    wage = info["wage"]
+    outph = info["output"]
+    price = prices.get(p, 0)
+    mat = material_cost(p, prices)
+    gross = outph * (price - mat) - wage
     if gross > 0:
         n = int(gross / (2 * wage * mgmt_rate) - 0.5)
         if n < 1: n = 1
@@ -205,17 +207,19 @@ for shop, data in retail_data.items():
         if rname in retail_price_map:
             lp = limit_profit(rname, prices, True)
             bp_dict[f"零售_{rname}"] = {"limit": round(lp, 0), "opt_level": 0}
-            wage = data["wage"]; rp = retail_price_map.get(rname, 0)
-            bp = prices.get(rname, 0); sales = data["items"][rname]
+            wage = data["wage"]
+            rp = retail_price_map.get(rname, 0)
+            bp = prices.get(rname, 0)
+            sales = data["items"][rname]
             gross = sales * (rp - bp) - wage
             if gross > 0:
                 n = int(gross / (2 * wage * mgmt_rate) - 0.5)
                 if n < 1: n = 1
                 bp_dict[f"零售_{rname}"]["opt_level"] = n
 
-output["building_profits"] = bp_dict
+output_data["building_profits"] = bp_dict
 
 with open("data_output.json", "w", encoding="utf-8") as f:
-    json.dump(output, f, ensure_ascii=False, indent=2)
+    json.dump(output_data, f, ensure_ascii=False, indent=2)
 
 print(f"✅ 统一倍率 {unified_mult:.4f}，迭代均衡完成 (目标CV≤{TOLERANCE})")
