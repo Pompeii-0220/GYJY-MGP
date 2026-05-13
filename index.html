@@ -84,25 +84,20 @@ function renderTable() {
     } else if (key === 'base_price') {
       va = a.base_price || 0; vb = b.base_price || 0;
     } else if (key === 'limit') {
-      const profitKeyA = a.is_retail ? '零售_' + a.name : a.name;
-      const profitKeyB = b.is_retail ? '零售_' + b.name : b.name;
-      va = profits[profitKeyA]?.limit || 0;
-      vb = profits[profitKeyB]?.limit || 0;
+      va = getProfitInfo(a).limit;
+      vb = getProfitInfo(b).limit;
     } else if (key === 'opt_level') {
-      const profitKeyA = a.is_retail ? '零售_' + a.name : a.name;
-      const profitKeyB = b.is_retail ? '零售_' + b.name : b.name;
-      va = profits[profitKeyA]?.opt_level || 0;
-      vb = profits[profitKeyB]?.opt_level || 0;
+      va = getProfitInfo(a).opt_level;
+      vb = getProfitInfo(b).opt_level;
     }
     return asc ? va - vb : vb - va;
   });
 
   const tbody = document.querySelector('#main-table tbody');
   tbody.innerHTML = items.map(it => {
-    const profitKey = it.is_retail ? '零售_' + it.name : it.name;
-    const profit = profits[profitKey] || {};
-    const limit = profit.limit ? profit.limit.toLocaleString() : '—';
-    const optLevel = profit.opt_level ? profit.opt_level.toLocaleString() : '—';
+    const info = getProfitInfo(it);
+    const limit = info.limit ? info.limit.toLocaleString() : '—';
+    const optLevel = info.opt_level ? info.opt_level.toLocaleString() : '—';
     return `<tr>
       <td>${it.name}${it.is_retail ? '<span class="tag">零售</span>' : ''}</td>
       <td class="price">${it.price.toFixed(2)} 元</td>
@@ -111,6 +106,26 @@ function renderTable() {
       <td class="opt-level">${optLevel}</td>
     </tr>`;
   }).join('');
+}
+
+function getProfitInfo(item) {
+  const profits = DATA.building_profits || {};
+  if (item.is_retail) {
+    // 零售品优先显示零售端利润
+    const retailKey = '零售_' + item.name;
+    if (profits[retailKey] && profits[retailKey].limit > 0) {
+      return profits[retailKey];
+    }
+    // 零售端无利润时看生产端
+    if (profits[item.name] && profits[item.name].limit > 0) {
+      return profits[item.name];
+    }
+    // 都没有则返回空
+    return {};
+  } else {
+    // 中间品直接显示生产端利润
+    return profits[item.name] || {};
+  }
 }
 
 document.querySelectorAll('#main-table th[data-sort]').forEach(th => {
