@@ -21,7 +21,7 @@ jobs:
         run: |
           git config --global user.name 'github-actions'
           git config --global user.email 'actions@github.com'
-          git add index.html data_output.json game_data.json static_equilibrium_prices.json static_prices_only.json optimal_params.json
+          git add index.html data_output.json
           if ! git diff --cached --quiet; then
             git commit -m "Update guide prices"
             git push
