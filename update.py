@@ -191,6 +191,10 @@ with open("static_equilibrium_prices.json", "w", encoding="utf-8") as f:
     json.dump(static_prices, f, indent=2, ensure_ascii=False)
 print("静态均衡价格表已保存")
 
+with open("static_prices_only.json", "w", encoding="utf-8") as f:
+    # 只保存商品名和对应的1.0倍率静态价
+    json.dump(static_prices, f, indent=2, ensure_ascii=False)
+
 # ================= 6. 统一市场倍率 =================
 total_w = 0.0
 sum_m = 0.0
